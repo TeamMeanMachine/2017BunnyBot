@@ -1,8 +1,6 @@
 package org.team2471.bunnybots.robot.subsystems
 
-
 import com.ctre.MotorControl.CANTalon
-import edu.wpi.first.wpilibj.Solenoid
 
 object Drive {
     private val leftMotor1 = CANTalon(14)

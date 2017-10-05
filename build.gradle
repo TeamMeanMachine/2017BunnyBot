@@ -12,14 +12,14 @@ plugins {
     id "java"
     id "eclipse"
     id "idea"
-    id "jaci.openrio.gradle.GradleRIO" version "2017.1.5"
+    id "jaci.openrio.gradle.GradleRIO" version "2017.2.3"
 }
 apply plugin: 'kotlin'
 
 frc {
     team = "2471"
-    robotClass = "steamworks.Robot"
-    rioIP = "10.24.71.2"
+    robotClass = "org.team2471.bunnybots.robot.Robot"
+    rioIP = "10.24.71.45"
 }
 
 repositories {
@@ -27,7 +27,7 @@ repositories {
 }
 
 wpi {
-    opencvVersion = "3.1.0"
+    opencvVersion = "3.2.0"
 }
 
 dependencies {
