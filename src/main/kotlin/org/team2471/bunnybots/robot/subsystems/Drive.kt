@@ -3,16 +3,16 @@ package org.team2471.bunnybots.robot.subsystems
 import com.ctre.MotorControl.CANTalon
 
 object Drive {
-    private val leftMotor1 = CANTalon(14)
+    private val leftMotor1 = CANTalon(12)
     private val leftMotor2 = CANTalon(13)
-    private val rightMotor1 = CANTalon(1)
-    private val rightMotor2 = CANTalon(0)
+    private val rightMotor1 = CANTalon(3)
+    private val rightMotor2 = CANTalon(2)
 
     fun drive(throttle: Double, softTurn: Double, hardTurn: Double) {
-        var leftPower = throttle + (softTurn * Math.abs(throttle))
-        var rightPower = throttle - (softTurn * Math.abs(throttle))
-        leftPower += hardTurn
-        rightPower -= hardTurn
+        var leftPower = throttle - (softTurn * Math.abs(throttle))
+        var rightPower = throttle + (softTurn * Math.abs(throttle))
+        leftPower -= hardTurn
+        rightPower += hardTurn
 
         val maxPower = Math.max(Math.abs(leftPower), Math.abs(rightPower))
         if (maxPower > 1){
