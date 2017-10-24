@@ -6,16 +6,17 @@ import edu.wpi.first.wpilibj.command.Command
 import edu.wpi.first.wpilibj.command.Subsystem
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import org.team2471.bunnybots.robot.Driver
+import org.team2471.bunnybots.robot.RobotMap.Talons as Talons
 
 object Drive : Subsystem() {
 
     private val EDGES_PER_100_MS = 216 * 4.0 / 10.0
 
     private val leftMotors = {
-        val master = CANTalon(12)
-        val slave1 = CANTalon(13)
-        val slave2 = CANTalon(14)
-        val slave3 = CANTalon(15)
+        val master = CANTalon(Talons.DRIVE_LEFT_MOTOR_1)
+        val slave1 = CANTalon(Talons.DRIVE_LEFT_MOTOR_2)
+        val slave2 = CANTalon(Talons.DRIVE_LEFT_MOTOR_3)
+        val slave3 = CANTalon(Talons.DRIVE_LEFT_MOTOR_4)
 
         master.changeControlMode(SmartMotorController.TalonControlMode.PercentVbus)
         slave1.changeControlMode(SmartMotorController.TalonControlMode.Follower)
@@ -34,10 +35,10 @@ object Drive : Subsystem() {
     }()
 
     private val rightMotors = {
-        val master = CANTalon(1)
-        val slave1 = CANTalon(2)
-        val slave2 = CANTalon(3)
-        val slave3 = CANTalon(4)
+        val master = CANTalon(Talons.DRIVE_RIGHT_MOTOR_1)
+        val slave1 = CANTalon(Talons.DRIVE_RIGHT_MOTOR_2)
+        val slave2 = CANTalon(Talons.DRIVE_RIGHT_MOTOR_3)
+        val slave3 = CANTalon(Talons.DRIVE_RIGHT_MOTOR_4)
 
         master.changeControlMode(SmartMotorController.TalonControlMode.PercentVbus)
         slave1.changeControlMode(SmartMotorController.TalonControlMode.Follower)
