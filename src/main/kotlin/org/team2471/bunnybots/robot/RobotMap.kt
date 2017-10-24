@@ -1,6 +1,10 @@
 package org.team2471.bunnybots.robot
 
+import edu.wpi.first.wpilibj.PowerDistributionPanel
+
 object RobotMap {
+    val pdp = PowerDistributionPanel()
+
     object Talons{
         val DRIVE_LEFT_MOTOR_1 = 0
         val DRIVE_LEFT_MOTOR_2 = 0
