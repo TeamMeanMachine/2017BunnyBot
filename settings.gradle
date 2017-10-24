@@ -1,0 +1,7 @@
+include 'lidar'
+include 'coprocessor'
+include 'robot'
+rootProject.name = '2017BunnyBot'
+include 'robot'
+include 'coprocessor'
+

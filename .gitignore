@@ -1,40 +1,13 @@
-# WPILib
-bin/
-build/
-dist/
-sysProps.xml
-workbench.xmi
+.idea
 
-# IDE
-*.ipr
-*.iml
-*.iws
-out/
-tmp/
-.settings/
-.loadpath
-.project
-/.idea
-.classpath
+.gradle
+**/build/
 
-# Toast/GradleRIO
-run/
-.gradle/
-gradle/.launch/
+# Ignore Gradle GUI config
+gradle-app.setting
 
-# OS Files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.AppleDouble
-.LSOverride
-.Trashes
-ehthumbs.db
-Thumbs.db
+# Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
+!gradle-wrapper.jar
 
-# backup files
-*~
-
-# directory for XML generated after running junit tests through ant
-junit/
+# Cache of project
+.gradletasknamecache

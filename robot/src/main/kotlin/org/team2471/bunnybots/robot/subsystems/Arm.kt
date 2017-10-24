@@ -8,10 +8,10 @@ import org.team2471.frc.lib.sensors.Magnepot
 
 
 object Arm {
-    private val shoulderMotorMaster = CANTalon(RobotMap.Talons.SHOULDER_MOTOR_1)
-    private val shoulderMotorSlave = CANTalon(RobotMap.Talons.SHOULDER_MOTOR_2)
-    private val wristMotor = CANTalon(RobotMap.Talons.WRIST_MOTOR)
-    private val intakeMotor = CANTalon(RobotMap.Talons.INTAKE_MOTOR)
+    private val shoulderMotorMaster = CANTalon(RobotMap.Talons.ARM_SHOULDER_MOTOR_1)
+    private val shoulderMotorSlave = CANTalon(RobotMap.Talons.ARM_SHOULDER_MOTOR_2)
+    private val wristMotor = CANTalon(RobotMap.Talons.ARM_WRIST_MOTOR)
+    private val intakeMotor = CANTalon(RobotMap.Talons.ARM_INTAKE_MOTOR)
     private val wristEncoder = Magnepot(0)
     private val shoulderEncoder = Magnepot(0)
     val shoulderController = PIDController(0.0, 0.0,0.0,shoulderEncoder, shoulderMotorMaster)
