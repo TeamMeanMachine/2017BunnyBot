@@ -31,3 +31,9 @@ compileKotlin {
         jvmTarget = "1.8"
     }
 }
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'org.team2471.bunnybots.coprocesor.MainKt'
+    }
+}
