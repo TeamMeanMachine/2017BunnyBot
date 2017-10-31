@@ -28,6 +28,8 @@ dependencies {
     compile "edu.wpi.first.wpilib.networktables.java:NetworkTables:+:arm"
 
     compile "com.edwardraff:JSAT:0.0.8"
+    compile group: 'org.knowm.xchart', name: 'xchart', version: '3.5.0'
+
 }
 
 compileKotlin {
