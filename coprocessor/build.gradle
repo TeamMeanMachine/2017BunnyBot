@@ -8,6 +8,7 @@ buildscript {
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+
     }
 }
 
@@ -24,6 +25,7 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
     compile group: 'net.java.dev.jna', name: 'jna-platform', version: '4.4.0'
+    compile group: 'org.knowm.xchart', name: 'xchart', version: '3.5.0'
 }
 
 compileKotlin {
