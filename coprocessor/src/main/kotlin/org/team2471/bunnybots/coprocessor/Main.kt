@@ -2,6 +2,7 @@ package org.team2471.bunnybots.coprocessor
 
 import io.scanse.sweep.SweepDevice
 import io.scanse.sweep.SweepSample
+import org.team2471.frc.lib.math.Point
 import java.lang.Math.*
 
 object Bucket {
@@ -22,12 +23,18 @@ fun SweepSample.distanceTo(secondSample: SweepSample): Double {
     return sqrt(sqr(a) + sqr(b) - 2 * a * b * cos(theta))
 }
 
+val CM_TO_FT = 30.48
+fun SweepSample.toPoint(): Point = Point(Math.cos(angle.toDouble()) * distance / CM_TO_FT,
+        Math.sin(angle.toDouble()) * distance / CM_TO_FT)
+
 fun main(args: Array<String>) {
     sweep.motorSpeed = 1
     sweep.sampleRate = 1000
     sweep.startScanning()
 
     for(scan in sweep.scans()) {
+        visualize(cluster(scan.map { it.toPoint() }))
         println("Objects: ${scan.size}")
+        Thread.sleep(Long.MAX_VALUE)
     }
 }
