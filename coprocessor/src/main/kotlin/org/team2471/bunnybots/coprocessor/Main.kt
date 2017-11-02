@@ -2,8 +2,13 @@ package org.team2471.bunnybots.coprocessor
 
 import io.scanse.sweep.SweepDevice
 import io.scanse.sweep.SweepSample
+import javafx.scene.chart.Axis
+import javafx.scene.chart.NumberAxis
 import org.team2471.frc.lib.math.Point
 import java.lang.Math.*
+import javafx.scene.chart.ScatterChart
+
+
 
 object Bucket {
     val circumference = 33
@@ -24,8 +29,8 @@ fun SweepSample.distanceTo(secondSample: SweepSample): Double {
 }
 
 val CM_TO_FT = 30.48
-fun SweepSample.toPoint(): Point = Point(Math.cos(angle.toDouble()) * distance / CM_TO_FT,
-        Math.sin(angle.toDouble()) * distance / CM_TO_FT)
+fun SweepSample.toPoint(): Point = Point(Math.cos(toRadians(angle/1000.0)) * distance / CM_TO_FT,
+        Math.sin(toRadians(angle/1000.0)) * distance / CM_TO_FT)
 
 fun main(args: Array<String>) {
     sweep.motorSpeed = 1
@@ -33,8 +38,12 @@ fun main(args: Array<String>) {
     sweep.startScanning()
 
     for(scan in sweep.scans()) {
-        visualize(cluster(scan.map { it.toPoint() }))
+        visualize2(cluster(scan.map { it.toPoint() }))
         println("Objects: ${scan.size}")
-        Thread.sleep(Long.MAX_VALUE)
+//        scan.forEach { println(it.angle/1000.0) }
+//        Thread.sleep(Long.MAX_VALUE)
+
+
+
     }
 }
