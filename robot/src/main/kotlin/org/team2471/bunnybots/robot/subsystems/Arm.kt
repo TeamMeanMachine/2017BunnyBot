@@ -40,4 +40,8 @@ object Arm : Subsystem(){
         }
     val hasBucket: Boolean
         get() = RobotMap.pdp.getCurrent(0) > 20
+
+    override fun initDefaultCommand() {
+        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 }
