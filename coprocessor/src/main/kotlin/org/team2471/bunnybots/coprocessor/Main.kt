@@ -37,8 +37,10 @@ fun main(args: Array<String>) {
     sweep.sampleRate = 1000
     sweep.startScanning()
 
+    Visualizer
+
     for(scan in sweep.scans()) {
-        visualize2(cluster(scan.map { it.toPoint() }))
+        Visualizer.update(cluster(scan.map { it.toPoint() }))
         println("Objects: ${scan.size}")
 //        scan.forEach { println(it.angle/1000.0) }
 //        Thread.sleep(Long.MAX_VALUE)

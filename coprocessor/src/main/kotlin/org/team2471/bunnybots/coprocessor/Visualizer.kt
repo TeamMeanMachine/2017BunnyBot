@@ -11,6 +11,7 @@ import org.knowm.xchart.XYChartBuilder
 import org.knowm.xchart.XYSeries
 import org.knowm.xchart.style.Styler
 import org.team2471.frc.lib.math.Point
+import java.awt.Color
 import java.awt.Graphics
 import java.lang.management.PlatformLoggingMXBean
 import javax.swing.JFrame
@@ -59,12 +60,14 @@ fun visualize2(clusterMap: Map<Int, List<Point>>){
 
 object Visualizer : JFrame() {
     private var data: Map<Int, List<Point>>? = null
-
+    private val size = 900
+    private val FEET_TO_PIXELS = width/2/10
     init {
         title = "LIDAR Visualizer"
         defaultCloseOperation = EXIT_ON_CLOSE
 
-        setSize(1600, 900)
+        setSize(size, size)
+        isVisible = true
     }
 
     fun update(clusterMap: Map<Int, List<Point>>) {
@@ -73,8 +76,21 @@ object Visualizer : JFrame() {
     }
 
     override fun paint(g: Graphics) {
+        g.color = Color.RED
+        g.fillOval(size/2, size/2, 10, 10)
+//        g.drawPolygon()
         val clusterMap = data ?: return
+        clusterMap.forEach { cluster, points ->
+            points.forEach { point ->
+                g.fillOval((size/2) + Math.round(point.x * FEET_TO_PIXELS).toInt(), (size/2)+ Math.round(point.y * FEET_TO_PIXELS).toInt(), 5, 5 )
+            }
+        }
+
     }
 
 
+}
+
+fun main(args: Array<String>) {
+    Visualizer
 }

@@ -5,6 +5,7 @@ import jsat.classifiers.DataPoint
 import jsat.clustering.HDBSCAN
 import jsat.linear.DenseVector
 import org.team2471.frc.lib.math.Point
+import java.util.*
 
 
 fun cluster(points: List<Point>): Map<Int, List<Point>> {
