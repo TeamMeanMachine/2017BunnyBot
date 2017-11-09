@@ -61,7 +61,8 @@ fun visualize2(clusterMap: Map<Int, List<Point>>){
 object Visualizer : JFrame() {
     private var data: Map<Int, List<Point>>? = null
     private val size = 900
-    private val FEET_TO_PIXELS = width/2/10
+    private val FEET_TO_PIXELS = size/2/10
+    private val colorMap = HashMap<Int, Color>()
     init {
         title = "LIDAR Visualizer"
         defaultCloseOperation = EXIT_ON_CLOSE
@@ -76,13 +77,17 @@ object Visualizer : JFrame() {
     }
 
     override fun paint(g: Graphics) {
+        g.clearRect(0, 0, size, size)
         g.color = Color.RED
         g.fillOval(size/2, size/2, 10, 10)
-//        g.drawPolygon()
         val clusterMap = data ?: return
         clusterMap.forEach { cluster, points ->
+            g.color = colorMap.getOrPut(cluster) {
+                Color(Math.random().toFloat(), Math.random().toFloat(), Math.random().toFloat())
+            }
             points.forEach { point ->
-                g.fillOval((size/2) + Math.round(point.x * FEET_TO_PIXELS).toInt(), (size/2)+ Math.round(point.y * FEET_TO_PIXELS).toInt(), 5, 5 )
+                g.fillOval((size/2) + Math.round(point.x * FEET_TO_PIXELS).toInt(),
+                        (size/2)+ Math.round(point.y * FEET_TO_PIXELS).toInt(), 10, 10 )
             }
         }
 

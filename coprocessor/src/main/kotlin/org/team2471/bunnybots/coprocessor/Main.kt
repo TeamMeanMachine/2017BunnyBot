@@ -2,12 +2,8 @@ package org.team2471.bunnybots.coprocessor
 
 import io.scanse.sweep.SweepDevice
 import io.scanse.sweep.SweepSample
-import javafx.scene.chart.Axis
-import javafx.scene.chart.NumberAxis
 import org.team2471.frc.lib.math.Point
 import java.lang.Math.*
-import javafx.scene.chart.ScatterChart
-
 
 
 object Bucket {
@@ -41,7 +37,7 @@ fun main(args: Array<String>) {
 
     for(scan in sweep.scans()) {
         Visualizer.update(cluster(scan.map { it.toPoint() }))
-        println("Objects: ${scan.size}")
+//        println("Objects: ${scan.size}")
 //        scan.forEach { println(it.angle/1000.0) }
 //        Thread.sleep(Long.MAX_VALUE)
 
