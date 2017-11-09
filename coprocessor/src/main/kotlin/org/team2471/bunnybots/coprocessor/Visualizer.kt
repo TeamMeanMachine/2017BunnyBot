@@ -54,7 +54,6 @@ fun visualize2(clusterMap: Map<Int, List<Point>>){
         Platform.runLater {
             panel.scene = Scene(sc)
         }
-
     }
 }
 
@@ -64,6 +63,8 @@ object Visualizer : JFrame() {
     init {
         title = "LIDAR Visualizer"
         defaultCloseOperation = EXIT_ON_CLOSE
+
+        setSize(1600, 900)
     }
 
     fun update(clusterMap: Map<Int, List<Point>>) {
@@ -73,7 +74,6 @@ object Visualizer : JFrame() {
 
     override fun paint(g: Graphics) {
         val clusterMap = data ?: return
-
     }
 
 
