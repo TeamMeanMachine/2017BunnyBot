@@ -5,7 +5,6 @@ import io.scanse.sweep.SweepSample
 import org.team2471.frc.lib.math.Point
 import java.lang.Math.*
 
-
 object Bucket {
     val circumference = 33
     val radius = circumference / 2

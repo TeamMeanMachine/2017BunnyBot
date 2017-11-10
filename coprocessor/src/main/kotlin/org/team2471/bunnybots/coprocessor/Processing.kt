@@ -8,10 +8,13 @@ import org.team2471.frc.lib.math.Point
 import java.util.*
 
 
+var minPoints = 10
+var minClusterSize = 3
+
 fun cluster(points: List<Point>): Map<Int, List<Point>> {
     val hdbScan = HDBSCAN()
-    hdbScan.minPoints = 10
-    hdbScan.minClusterSize = 3
+    hdbScan.minPoints = minPoints
+    hdbScan.minClusterSize = minClusterSize
 
     val dataSet = SimpleDataSet(points.map { DataPoint(DenseVector.toDenseVec(it.x, it.y)) } )
 
