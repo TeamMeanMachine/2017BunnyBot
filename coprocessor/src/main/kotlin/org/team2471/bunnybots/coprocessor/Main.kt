@@ -23,9 +23,9 @@ fun SweepSample.distanceTo(secondSample: SweepSample): Double {
     return sqrt(sqr(a) + sqr(b) - 2 * a * b * cos(theta))
 }
 
-val CM_TO_FT = 30.48
-fun SweepSample.toPoint(): Point = Point(Math.cos(toRadians(angle/1000.0)) * distance / CM_TO_FT,
-        Math.sin(toRadians(angle/1000.0)) * distance / CM_TO_FT)
+const val CM_TO_FT = 30.48
+fun SweepSample.toPoint(): Point = -Point(Math.sin(toRadians(angle/1000.0)) * distance / CM_TO_FT,
+        Math.cos(toRadians(angle/1000.0)) * distance / CM_TO_FT)
 
 fun main(args: Array<String>) {
     sweep.motorSpeed = 1
