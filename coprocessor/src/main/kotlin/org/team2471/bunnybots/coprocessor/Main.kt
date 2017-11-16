@@ -28,7 +28,7 @@ fun SweepSample.toPoint(): Point = -Point(Math.sin(toRadians(angle/1000.0)) * di
         Math.cos(toRadians(angle/1000.0)) * distance / CM_TO_FT)
 
 fun main(args: Array<String>) {
-    sweep.motorSpeed = 1
+    sweep.motorSpeed = 2
     sweep.sampleRate = 1000
     sweep.startScanning()
 
