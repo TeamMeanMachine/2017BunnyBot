@@ -1,6 +1,5 @@
 package org.team2471.bunnybots.coprocessor
 
-import org.team2471.frc.lib.math.Line
 import org.team2471.frc.lib.math.Point
 import java.awt.BorderLayout
 import java.awt.Color
@@ -62,6 +61,8 @@ object Visualizer : JFrame() {
             }
 
             if(cluster == -1) return@forEach
+            val bucketRating = bucketRating(points)
+
             with(midPoint) {
                 g.color = Color.BLACK
                 g.fillOval((size/2) + Math.round(x * FEET_TO_PIXELS).toInt() - radius/2,
@@ -78,13 +79,15 @@ object Visualizer : JFrame() {
                         size/2 + y.toInt() * FEET_TO_PIXELS + 15)
                 g.drawString("Points: ${points.size}", (size/2) + x.toInt() * FEET_TO_PIXELS,
                         size/2 + y.toInt() * FEET_TO_PIXELS + 30)
+                g.drawString("Bucket Rating: $bucketRating", (size/2) + x.toInt() * FEET_TO_PIXELS,
+                        size/2 + y.toInt() * FEET_TO_PIXELS + 45)
 
             }
 
         }
         g.color = Color.BLACK
         g.drawString("Min Points: $minPoints", 20, 60)
-        g.drawString("Min Cluster Size: $minClusterSize", 20, 80)
+        g.drawString("Epsilon: $epsilon", 20, 80)
         g.drawString("Frozen: $frozen", 20, 100)
     }
 
@@ -99,27 +102,27 @@ object Visualizer : JFrame() {
 
             val toolBarPanel = JPanel(GridLayout(5,5))
 
-            toolBarPanel.add(JButton("+ Min Points").apply {
+            toolBarPanel.add(JButton("Min Points +").apply {
                 addActionListener {
                     minPoints++
                 }
             })
 
-            toolBarPanel.add(JButton("- Min Points").apply {
+            toolBarPanel.add(JButton("Min Points -").apply {
                 addActionListener {
                     minPoints--
                 }
             })
 
-            toolBarPanel.add(JButton("+ Min Cluster Size").apply {
+            toolBarPanel.add(JButton("Epsilon +").apply {
                 addActionListener {
-                    minClusterSize++
+                    epsilon += 0.25
                 }
             })
 
-            toolBarPanel.add(JButton("- Min Cluster Size").apply {
+            toolBarPanel.add(JButton("Epsilon -").apply {
                 addActionListener {
-                    minClusterSize--
+                    epsilon -= 0.25
                 }
             })
 

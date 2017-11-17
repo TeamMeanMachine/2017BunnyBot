@@ -2,29 +2,21 @@ package org.team2471.bunnybots.coprocessor
 
 import jsat.SimpleDataSet
 import jsat.classifiers.DataPoint
-import jsat.clustering.HDBSCAN
+import jsat.clustering.DBSCAN
 import jsat.linear.DenseVector
-import jsat.linear.distancemetrics.EuclideanDistance
-import jsat.linear.distancemetrics.SquaredEuclideanDistance
 import org.team2471.frc.lib.math.Point
 import java.util.*
 
 
-var minPoints = 10
-var minClusterSize = 3
+var minPoints = 4
+var epsilon = 0.75
 
 fun cluster(points: List<Point>): Map<Int, List<Point>> {
-    val hdbScan = HDBSCAN(minPoints)
-    hdbScan.minClusterSize = minClusterSize
+    val dbScan = DBSCAN()
 
-    val dataSet = SimpleDataSet(points.map { DataPoint(DenseVector.toDenseVec(it.x, it.y)) } )
+    val dataSet = SimpleDataSet(points.map { DataPoint(DenseVector.toDenseVec(it.x, it.y)) })
 
-    val designations = try {
-        hdbScan.cluster(dataSet, IntArray(points.size))
-    } catch(e: Exception) {
-        println(e.message)
-        IntArray(points.size) { -1 }
-    }
+    val designations = dbScan.cluster(dataSet, epsilon, minPoints, IntArray(points.size))
 
     val result = HashMap<Int, MutableList<Point>>()
 
@@ -41,7 +33,13 @@ fun cluster(points: List<Point>): Map<Int, List<Point>> {
 //data class BucketResult(val center: Point, )
 
 fun bucketRating(points: List<Point>): Double {
+    val midPoint = points.reduce { acc, point -> acc + point } / points.size.toDouble()
 
+    val averageRadius = points.map { point -> point.distance(midPoint) }.average()
 
-    return 0.0
+    return if (averageRadius > 0.2 && averageRadius < 0.35) {
+        1.0
+    } else {
+        0.0
+    }
 }
