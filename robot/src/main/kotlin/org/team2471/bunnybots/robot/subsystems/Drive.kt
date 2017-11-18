@@ -10,31 +10,50 @@ import org.team2471.frc.lib.control.experimental.registerDefaultCommand
 import org.team2471.frc.lib.control.plus
 import org.team2471.bunnybots.robot.RobotMap.Talons as Talons
 
+private const val DRIVE_CURRENT_LIMIT = 25
+private const val DRIVE_RAMP_RATE = 72.0
+
 object Drive {
     private val EDGES_PER_100_MS = 216 * 4.0 / 10.0
     private val table = NetworkTable.getTable("Drive")
 
     private val leftMotors = CANTalon(Talons.DRIVE_LEFT_MOTOR_1).apply {
         changeControlMode(SmartMotorController.TalonControlMode.PercentVbus)
-        setVoltageRampRate(72.0)
+        setVoltageRampRate(DRIVE_RAMP_RATE)
+        setCurrentLimit(DRIVE_CURRENT_LIMIT)
+        EnableCurrentLimit(true)
     } + CANTalon(Talons.DRIVE_LEFT_MOTOR_2).apply {
-        setVoltageRampRate(72.0)
+        setVoltageRampRate(DRIVE_RAMP_RATE)
+        setCurrentLimit(DRIVE_CURRENT_LIMIT)
+        EnableCurrentLimit(true)
     } + CANTalon(Talons.DRIVE_LEFT_MOTOR_3).apply {
-        setVoltageRampRate(72.0)
+        setVoltageRampRate(DRIVE_RAMP_RATE)
+        setCurrentLimit(DRIVE_CURRENT_LIMIT)
+        EnableCurrentLimit(true)
     } + CANTalon(Talons.DRIVE_LEFT_MOTOR_4).apply {
-        setVoltageRampRate(72.0)
+        setVoltageRampRate(DRIVE_RAMP_RATE)
+        setCurrentLimit(DRIVE_CURRENT_LIMIT)
+        EnableCurrentLimit(true)
     }
 
     private val rightMotors = CANTalon(Talons.DRIVE_LEFT_MOTOR_1).apply {
         changeControlMode(SmartMotorController.TalonControlMode.PercentVbus)
         inverted = true
-        setVoltageRampRate(72.0)
+        setVoltageRampRate(DRIVE_RAMP_RATE)
+        setCurrentLimit(DRIVE_CURRENT_LIMIT)
+        EnableCurrentLimit(true)
     } + CANTalon(Talons.DRIVE_LEFT_MOTOR_2).apply {
-        setVoltageRampRate(72.0)
+        setVoltageRampRate(DRIVE_RAMP_RATE)
+        setCurrentLimit(DRIVE_CURRENT_LIMIT)
+        EnableCurrentLimit(true)
     } + CANTalon(Talons.DRIVE_LEFT_MOTOR_3).apply {
-        setVoltageRampRate(72.0)
+        setVoltageRampRate(DRIVE_RAMP_RATE)
+        setCurrentLimit(DRIVE_CURRENT_LIMIT)
+        EnableCurrentLimit(true)
     } + CANTalon(Talons.DRIVE_LEFT_MOTOR_4).apply {
-        setVoltageRampRate(72.0)
+        setVoltageRampRate(DRIVE_RAMP_RATE)
+        setCurrentLimit(DRIVE_CURRENT_LIMIT)
+        EnableCurrentLimit(true)
     }
 
     val speed: Double get() = Math.abs(-leftMotors.encVelocity / EDGES_PER_100_MS + rightMotors.encVelocity / EDGES_PER_100_MS) / 2.0
