@@ -8,6 +8,7 @@ import org.team2471.bunnybots.robot.Driver
 import org.team2471.frc.lib.control.experimental.Command
 import org.team2471.frc.lib.control.experimental.registerDefaultCommand
 import org.team2471.frc.lib.control.plus
+import org.team2471.frc.lib.util.measureTimeFPGA
 import org.team2471.bunnybots.robot.RobotMap.Talons as Talons
 
 private const val DRIVE_CURRENT_LIMIT = 25
@@ -62,9 +63,10 @@ object Drive {
     val rightDistance: Double get() = rightMotors.position
 
     init {
-        registerDefaultCommand(CommonPool, Command(Drive) {
+        registerDefaultCommand(CommonPool, Command(this) {
             periodic(10) {
-                Drive.drive(Driver.throttle, Driver.softTurn, Driver.hardTurn)
+                val time = measureTimeFPGA { drive(Driver.throttle, Driver.softTurn, Driver.hardTurn) }
+                table.putNumber("Loop Timing", time)
             }
         })
     }
