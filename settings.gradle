@@ -1,3 +1,4 @@
 rootProject.name = '2017BunnyBot'
 include 'robot'
 include 'coprocessor'
+include 'meanlib'

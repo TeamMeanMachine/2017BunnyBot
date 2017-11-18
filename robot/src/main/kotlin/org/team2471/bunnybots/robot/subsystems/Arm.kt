@@ -3,12 +3,11 @@ package org.team2471.bunnybots.robot.subsystems
 import com.ctre.MotorControl.CANTalon
 import com.ctre.MotorControl.SmartMotorController
 import edu.wpi.first.wpilibj.PIDController
-import edu.wpi.first.wpilibj.command.Subsystem
 import org.team2471.bunnybots.robot.RobotMap
 import org.team2471.frc.lib.sensors.Magnepot
 
 
-object Arm : Subsystem(){
+object Arm {
     private val shoulderMotorMaster = CANTalon(RobotMap.Talons.ARM_SHOULDER_MOTOR_1)
     private val shoulderMotorSlave = CANTalon(RobotMap.Talons.ARM_SHOULDER_MOTOR_2)
     private val wristMotor = CANTalon(RobotMap.Talons.ARM_WRIST_MOTOR)
@@ -40,8 +39,4 @@ object Arm : Subsystem(){
         }
     val hasBucket: Boolean
         get() = RobotMap.pdp.getCurrent(0) > 20
-
-    override fun initDefaultCommand() {
-        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
 }

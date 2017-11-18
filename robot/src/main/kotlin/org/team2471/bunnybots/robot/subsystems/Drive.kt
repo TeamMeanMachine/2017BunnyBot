@@ -3,12 +3,11 @@ package org.team2471.bunnybots.robot.subsystems
 import com.ctre.MotorControl.CANTalon
 import com.ctre.MotorControl.SmartMotorController
 import edu.wpi.first.wpilibj.command.Command
-import edu.wpi.first.wpilibj.command.Subsystem
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import org.team2471.bunnybots.robot.Driver
 import org.team2471.bunnybots.robot.RobotMap.Talons as Talons
 
-object Drive : Subsystem() {
+object Drive {
 
     private val EDGES_PER_100_MS = 216 * 4.0 / 10.0
 
@@ -85,25 +84,21 @@ object Drive : Subsystem() {
         leftMotors.set(throttle)
         rightMotors.set(throttle)
     }
-
-    override fun initDefaultCommand() {
-        defaultCommand = DriveDefaultCommand
-    }
 }
 
-object DriveDefaultCommand : Command() {
-
-    init {
-        requires(Drive)
-    }
-
-    override fun execute() {
-        Drive.drive(Driver.throttle, Driver.softTurn, Driver.hardTurn)
-        SmartDashboard.putNumber("Drive Speed", Drive.getSpeed)
-        SmartDashboard.putString("Drive Distance", "${Drive.leftDistance}:${Drive.rightDistance}")
-
-    }
-
-    override fun isFinished(): Boolean = false
-
-}
+//object DriveDefaultCommand : Command() {
+//
+//    init {
+//        requires(Drive)
+//    }
+//
+//    override fun execute() {
+//        Drive.drive(Driver.throttle, Driver.softTurn, Driver.hardTurn)
+//        SmartDashboard.putNumber("Drive Speed", Drive.getSpeed)
+//        SmartDashboard.putString("Drive Distance", "${Drive.leftDistance}:${Drive.rightDistance}")
+//
+//    }
+//
+//    override fun isFinished(): Boolean = false
+//
+//}
