@@ -2,66 +2,53 @@ package org.team2471.bunnybots.robot.subsystems
 
 import com.ctre.MotorControl.CANTalon
 import com.ctre.MotorControl.SmartMotorController
-import edu.wpi.first.wpilibj.command.Command
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
+import edu.wpi.first.wpilibj.networktables.NetworkTable
+import kotlinx.coroutines.experimental.CommonPool
 import org.team2471.bunnybots.robot.Driver
+import org.team2471.frc.lib.control.experimental.Command
+import org.team2471.frc.lib.control.experimental.registerDefaultCommand
+import org.team2471.frc.lib.control.plus
 import org.team2471.bunnybots.robot.RobotMap.Talons as Talons
 
 object Drive {
-
     private val EDGES_PER_100_MS = 216 * 4.0 / 10.0
+    private val table = NetworkTable.getTable("Drive")
 
-    private val leftMotors = {
-        val master = CANTalon(Talons.DRIVE_LEFT_MOTOR_1)
-        val slave1 = CANTalon(Talons.DRIVE_LEFT_MOTOR_2)
-        val slave2 = CANTalon(Talons.DRIVE_LEFT_MOTOR_3)
-        val slave3 = CANTalon(Talons.DRIVE_LEFT_MOTOR_4)
+    private val leftMotors = CANTalon(Talons.DRIVE_LEFT_MOTOR_1).apply {
+        changeControlMode(SmartMotorController.TalonControlMode.PercentVbus)
+        setVoltageRampRate(72.0)
+    } + CANTalon(Talons.DRIVE_LEFT_MOTOR_2).apply {
+        setVoltageRampRate(72.0)
+    } + CANTalon(Talons.DRIVE_LEFT_MOTOR_3).apply {
+        setVoltageRampRate(72.0)
+    } + CANTalon(Talons.DRIVE_LEFT_MOTOR_4).apply {
+        setVoltageRampRate(72.0)
+    }
 
-        master.changeControlMode(SmartMotorController.TalonControlMode.PercentVbus)
-        slave1.changeControlMode(SmartMotorController.TalonControlMode.Follower)
-        slave1.set(master.deviceID.toDouble())
-        slave2.changeControlMode(SmartMotorController.TalonControlMode.Follower)
-        slave2.set(master.deviceID.toDouble())
-        slave3.changeControlMode(SmartMotorController.TalonControlMode.Follower)
-        slave3.set(master.deviceID.toDouble())
+    private val rightMotors = CANTalon(Talons.DRIVE_LEFT_MOTOR_1).apply {
+        changeControlMode(SmartMotorController.TalonControlMode.PercentVbus)
+        inverted = true
+        setVoltageRampRate(72.0)
+    } + CANTalon(Talons.DRIVE_LEFT_MOTOR_2).apply {
+        setVoltageRampRate(72.0)
+    } + CANTalon(Talons.DRIVE_LEFT_MOTOR_3).apply {
+        setVoltageRampRate(72.0)
+    } + CANTalon(Talons.DRIVE_LEFT_MOTOR_4).apply {
+        setVoltageRampRate(72.0)
+    }
 
-        master.setVoltageRampRate(72.0)
-        slave1.setVoltageRampRate(72.0)
-        slave2.setVoltageRampRate(72.0)
-        slave3.setVoltageRampRate(72.0)
-
-        master
-    }()
-
-    private val rightMotors = {
-        val master = CANTalon(Talons.DRIVE_RIGHT_MOTOR_1)
-        val slave1 = CANTalon(Talons.DRIVE_RIGHT_MOTOR_2)
-        val slave2 = CANTalon(Talons.DRIVE_RIGHT_MOTOR_3)
-        val slave3 = CANTalon(Talons.DRIVE_RIGHT_MOTOR_4)
-
-        master.changeControlMode(SmartMotorController.TalonControlMode.PercentVbus)
-        slave1.changeControlMode(SmartMotorController.TalonControlMode.Follower)
-        slave1.set(master.deviceID.toDouble())
-        slave2.changeControlMode(SmartMotorController.TalonControlMode.Follower)
-        slave2.set(master.deviceID.toDouble())
-        slave3.changeControlMode(SmartMotorController.TalonControlMode.Follower)
-        slave3.set(master.deviceID.toDouble())
-
-        master.inverted = true
-
-        master.setVoltageRampRate(72.0)
-        slave1.setVoltageRampRate(72.0)
-        slave2.setVoltageRampRate(72.0)
-        slave3.setVoltageRampRate(72.0)
-
-        master
-    }()
-
-    val getSpeed: Double get() = Math.abs(-leftMotors.getEncVelocity() / EDGES_PER_100_MS + rightMotors.getEncVelocity() / EDGES_PER_100_MS) / 2.0
+    val speed: Double get() = Math.abs(-leftMotors.encVelocity / EDGES_PER_100_MS + rightMotors.encVelocity / EDGES_PER_100_MS) / 2.0
 
     val leftDistance: Double get() = leftMotors.position
     val rightDistance: Double get() = rightMotors.position
 
+    init {
+        registerDefaultCommand(CommonPool, Command(Drive) {
+            periodic(10) {
+                Drive.drive(Driver.throttle, Driver.softTurn, Driver.hardTurn)
+            }
+        })
+    }
 
     fun drive(throttle: Double, softTurn: Double, hardTurn: Double) {
         var leftPower = throttle - (softTurn * Math.abs(throttle))
@@ -85,20 +72,3 @@ object Drive {
         rightMotors.set(throttle)
     }
 }
-
-//object DriveDefaultCommand : Command() {
-//
-//    init {
-//        requires(Drive)
-//    }
-//
-//    override fun execute() {
-//        Drive.drive(Driver.throttle, Driver.softTurn, Driver.hardTurn)
-//        SmartDashboard.putNumber("Drive Speed", Drive.getSpeed)
-//        SmartDashboard.putString("Drive Distance", "${Drive.leftDistance}:${Drive.rightDistance}")
-//
-//    }
-//
-//    override fun isFinished(): Boolean = false
-//
-//}
