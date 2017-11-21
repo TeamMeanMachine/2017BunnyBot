@@ -64,28 +64,27 @@ object Drive {
 
     init {
         registerDefaultCommand(CommonPool, Command(this) {
-            periodic(10) {
-                val time = measureTimeFPGA { drive(Driver.throttle, Driver.softTurn, Driver.hardTurn) }
+            periodic(15) {
+                val time = measureTimeFPGA {
+                    drive(Driver.throttle, Driver.softTurn, Driver.hardTurn)
+                }
                 table.putNumber("Loop Timing", time)
             }
         })
     }
 
     fun drive(throttle: Double, softTurn: Double, hardTurn: Double) {
-        var leftPower = throttle - (softTurn * Math.abs(throttle))
-        var rightPower = throttle + (softTurn * Math.abs(throttle))
-        leftPower -= hardTurn
-        rightPower += hardTurn
+        var leftPower = throttle + (softTurn * Math.abs(throttle)) + hardTurn
+        var rightPower = throttle - (softTurn * Math.abs(throttle)) - hardTurn
 
         val maxPower = Math.max(Math.abs(leftPower), Math.abs(rightPower))
-        if (maxPower > 1){
+        if (maxPower > 1) {
             leftPower /= maxPower
             rightPower /= maxPower
         }
 
         leftMotors.set(leftPower)
         rightMotors.set(rightPower)
-
     }
 
     fun driveStraight(throttle: Double) {

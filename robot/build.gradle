@@ -18,7 +18,8 @@ apply plugin: "jaci.openrio.gradle.GradleRIO"
 
 frc {
     team = "2471"
-    robotClass = "org.team2471.bunnybots.robot.Robot"
+//    robotClass = "org.team2471.bunnybots.robot.Robot"
+    robotClass = "org.team2471.bunnybots.test.MotorTest"
     rioIP = "10.24.71.45"
 }
 
