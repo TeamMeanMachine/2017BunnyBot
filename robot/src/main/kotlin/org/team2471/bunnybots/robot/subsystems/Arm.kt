@@ -2,41 +2,52 @@ package org.team2471.bunnybots.robot.subsystems
 
 import com.ctre.MotorControl.CANTalon
 import com.ctre.MotorControl.SmartMotorController
-import edu.wpi.first.wpilibj.PIDController
+import kotlinx.coroutines.experimental.delay
+import kotlinx.coroutines.experimental.launch
 import org.team2471.bunnybots.robot.RobotMap
-import org.team2471.frc.lib.sensors.Magnepot
+import org.team2471.frc.lib.control.experimental.Command
+import org.team2471.frc.lib.control.plus
+import org.team2471.frc.lib.motion_profiling.MotionCurve
+import org.team2471.frc.lib.motion_profiling.MotionProfileAnimation
+import javax.swing.undo.CannotRedoException
 
 
 object Arm {
-    private val shoulderMotorMaster = CANTalon(RobotMap.Talons.ARM_SHOULDER_MOTOR_1)
-    private val shoulderMotorSlave = CANTalon(RobotMap.Talons.ARM_SHOULDER_MOTOR_2)
-    private val wristMotor = CANTalon(RobotMap.Talons.ARM_WRIST_MOTOR)
-    private val intakeMotor = CANTalon(RobotMap.Talons.ARM_INTAKE_MOTOR)
-    private val wristEncoder = Magnepot(0)
-    private val shoulderEncoder = Magnepot(0)
-    val shoulderController = PIDController(0.0, 0.0,0.0,shoulderEncoder, shoulderMotorMaster)
-    val wristController = PIDController(0.0,0.0,0.0, wristEncoder, wristMotor)
-    init {
-        shoulderMotorSlave.changeControlMode(SmartMotorController.TalonControlMode.Follower)
-        shoulderController.setpoint = 0.0
-        wristController.setpoint = 0.0
-        shoulderController.enable()
-        wristController.enable()
+    private val shoulderMotors = CANTalon(RobotMap.Talons.ARM_SHOULDER_MOTOR_1).apply {
+        changeControlMode(SmartMotorController.TalonControlMode.Position)
+        setFeedbackDevice(SmartMotorController.FeedbackDevice.AnalogPot)
+    } + (CANTalon(RobotMap.Talons.ARM_SHOULDER_MOTOR_2).apply { inverted = true })
+    private val wristMotor = CANTalon(RobotMap.Talons.ARM_WRIST_MOTOR).apply {
+        changeControlMode(SmartMotorController.TalonControlMode.Position)
+        setFeedbackDevice(SmartMotorController.FeedbackDevice.CtreMagEncoder_Absolute)
     }
+    private val intakeMotor = CANTalon(RobotMap.Talons.ARM_INTAKE_MOTOR)
+
     var intake: Double
         get() = intakeMotor.get()
         set(speed) = intakeMotor.set(speed)
 
     var shoulderAngle: Double
-        get() = shoulderEncoder.pidGet()
+        get() = shoulderMotors.pidGet()
         set(angle) {
-            shoulderController.setpoint = angle
+            shoulderMotors.set(angle)
         }
     var wristAngle: Double
-        get() = wristEncoder.pidGet()
+        get() = wristMotor.pidGet()
         set(angle) {
-            shoulderController.setpoint = angle
+            wristMotor.set(angle)
         }
     val hasBucket: Boolean
         get() = RobotMap.pdp.getCurrent(0) > 20
+
+    fun playAnimation(shoulderCurve:MotionCurve, wristCurve:MotionCurve) =  Command(this) {
+        val length = Math.max(shoulderCurve.length, wristCurve.length)
+        periodic(condition = { elapsedTimeSeconds < length }) {
+            shoulderAngle = shoulderCurve.getValue(elapsedTimeSeconds)
+            wristAngle = wristCurve.getValue(elapsedTimeSeconds)
+        }
+    }
+
+
+
 }

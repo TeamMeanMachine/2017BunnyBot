@@ -2,10 +2,10 @@ package org.team2471.bunnybots.robot
 
 
 import edu.wpi.first.wpilibj.IterativeRobot
-import edu.wpi.first.wpilibj.livewindow.LiveWindow
 import kotlinx.coroutines.experimental.CommonPool
+import org.team2471.bunnybots.robot.subsystems.Arm
 import org.team2471.bunnybots.robot.subsystems.Drive
-import org.team2471.frc.lib.control.experimental.Command
+import org.team2471.frc.lib.motion_profiling.MotionCurve
 
 class Robot : IterativeRobot() {
     init {
@@ -15,13 +15,16 @@ class Robot : IterativeRobot() {
 
     override fun robotInit() {
         Drive
-//        Arm
+        Arm
     }
 
     override fun robotPeriodic() {
     }
 
     override fun autonomousInit() {
+        val animation = Arm.playAnimation(MotionCurve(), MotionCurve())
+
+        animation(CommonPool)
     }
 
     override fun autonomousPeriodic() {

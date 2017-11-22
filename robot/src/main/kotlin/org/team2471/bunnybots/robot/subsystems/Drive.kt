@@ -5,6 +5,7 @@ import com.ctre.MotorControl.SmartMotorController
 import edu.wpi.first.wpilibj.networktables.NetworkTable
 import kotlinx.coroutines.experimental.CommonPool
 import org.team2471.bunnybots.robot.Driver
+import org.team2471.bunnybots.robot.RobotMap
 import org.team2471.frc.lib.control.experimental.Command
 import org.team2471.frc.lib.control.experimental.registerDefaultCommand
 import org.team2471.frc.lib.control.plus
@@ -68,6 +69,13 @@ object Drive {
                 val time = measureTimeFPGA {
                     drive(Driver.throttle, Driver.softTurn, Driver.hardTurn)
                 }
+                val leftAmperage = listOf(Talons.DRIVE_LEFT_MOTOR_1, Talons.DRIVE_LEFT_MOTOR_2,
+                        Talons.DRIVE_LEFT_MOTOR_3, Talons.DRIVE_LEFT_MOTOR_4).map { RobotMap.pdp.getCurrent(it) }.average()
+                val rightAmperage = listOf(Talons.DRIVE_LEFT_MOTOR_1, Talons.DRIVE_LEFT_MOTOR_2,
+                        Talons.DRIVE_LEFT_MOTOR_3, Talons.DRIVE_LEFT_MOTOR_4).map { RobotMap.pdp.getCurrent(it) }.average()
+
+                table.putNumber("Left Side Average Amperage", leftAmperage)
+                table.putNumber("Right Side Average Amperage", rightAmperage)
                 table.putNumber("Loop Timing", time)
             }
         })
