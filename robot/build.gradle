@@ -11,16 +11,26 @@ buildscript {
 plugins {
     id "java"
     id "idea"
+    id "jaci.openrio.gradle.GradleRIO" version "2017.11.17"
 }
 
 apply plugin: "kotlin"
-apply plugin: "jaci.openrio.gradle.GradleRIO"
 
-frc {
-    team = "2471"
-    robotClass = "org.team2471.bunnybots.robot.Robot"
-//    robotClass = "org.team2471.bunnybots.test.MotorTest"
-    rioIP = "10.24.71.45"
+
+def TEAM = 2471
+def ROBOT_CLASS = "org.team2471.bunnybots.robot.Robot"
+
+deploy {
+    targets {
+        target("roborio", jaci.openrio.gradle.frc.RoboRIO) {
+            team = TEAM
+        }
+    }
+    artifacts {
+        artifact('frcJava', jaci.openrio.gradle.frc.FRCJavaArtifact) {
+            targets << "roborio"
+        }
+    }
 }
 
 repositories {
@@ -33,7 +43,8 @@ wpi {
 
 dependencies {
     compile wpilib()
-    compile talonSrx()
+    compile ctre()
+    compile navx()
     compile project(":meanlib")
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1'
@@ -41,14 +52,9 @@ dependencies {
 
 }
 
-def robotManifest = {
-    attributes 'Main-Class': 'edu.wpi.first.wpilibj.RobotBase'
-    attributes 'Robot-Class': frc.robotClass
-}
-
 jar {
     from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
-    manifest robotManifest
+    manifest jaci.openrio.gradle.GradleRIOPlugin.javaManifest(ROBOT_CLASS)
 }
 
 compileKotlin {

@@ -1,8 +1,8 @@
 package org.team2471.bunnybots.robot
 
 import edu.wpi.first.wpilibj.XboxController
+import org.team2471.frc.lib.math.squareWithSign
 import org.team2471.frc.lib.util.deadband
-import org.team2471.frc.lib.util.squaredWithSign
 
 object Driver {
     private val controller = XboxController(0)
@@ -10,7 +10,7 @@ object Driver {
     val throttle: Double
         get() = -controller.getRawAxis(1)
                 .deadband(0.2)
-                .squaredWithSign()
+                .squareWithSign()
 
     val softTurn: Double
         get() = controller.getRawAxis(4)
@@ -21,4 +21,17 @@ object Driver {
 
 object CoDriver {
     private val controller = XboxController(1)
+
+    val shoulder: Double
+        get() = controller.getRawAxis(1)
+                .deadband(0.2)
+                .squareWithSign()
+
+    val wrist: Double
+        get() = controller.getRawAxis(5)
+                .deadband(0.2)
+                .squareWithSign()
+
+    val intake: Double
+        get() = -controller.getRawAxis(2) + controller.getRawAxis(3)
 }

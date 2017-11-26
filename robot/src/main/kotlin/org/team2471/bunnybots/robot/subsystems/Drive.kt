@@ -1,9 +1,10 @@
 package org.team2471.bunnybots.robot.subsystems
 
-import com.ctre.MotorControl.CANTalon
-import com.ctre.MotorControl.SmartMotorController
+import com.ctre.CANTalon
+import edu.wpi.first.wpilibj.Solenoid
 import edu.wpi.first.wpilibj.networktables.NetworkTable
 import kotlinx.coroutines.experimental.CommonPool
+import org.team2471.bunnybots.plus
 import org.team2471.bunnybots.robot.Driver
 import org.team2471.bunnybots.robot.RobotMap
 import org.team2471.frc.lib.control.experimental.Command
@@ -19,8 +20,10 @@ object Drive {
     private val EDGES_PER_100_MS = 216 * 4.0 / 10.0
     private val table = NetworkTable.getTable("Drive")
 
+    private val shifter = Solenoid(0)
+
     private val leftMotors = CANTalon(Talons.DRIVE_LEFT_MOTOR_1).apply {
-        changeControlMode(SmartMotorController.TalonControlMode.PercentVbus)
+        changeControlMode(CANTalon.TalonControlMode.PercentVbus)
         setVoltageRampRate(DRIVE_RAMP_RATE)
         setCurrentLimit(DRIVE_CURRENT_LIMIT)
         EnableCurrentLimit(true)
@@ -39,7 +42,7 @@ object Drive {
     }
 
     private val rightMotors = CANTalon(Talons.DRIVE_RIGHT_MOTOR_1).apply {
-        changeControlMode(SmartMotorController.TalonControlMode.PercentVbus)
+        changeControlMode(CANTalon.TalonControlMode.PercentVbus)
         inverted = true
         setVoltageRampRate(DRIVE_RAMP_RATE)
         setCurrentLimit(DRIVE_CURRENT_LIMIT)
