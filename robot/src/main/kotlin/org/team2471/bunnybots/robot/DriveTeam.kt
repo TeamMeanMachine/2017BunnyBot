@@ -1,8 +1,8 @@
 package org.team2471.bunnybots.robot
 
 import edu.wpi.first.wpilibj.XboxController
+import org.team2471.frc.lib.math.deadband
 import org.team2471.frc.lib.math.squareWithSign
-import org.team2471.frc.lib.util.deadband
 
 object Driver {
     private val controller = XboxController(0)
@@ -34,4 +34,7 @@ object CoDriver {
 
     val intake: Double
         get() = -controller.getRawAxis(2) + controller.getRawAxis(3)
+
+    val isSpitting get() = controller.getRawButton(3
+    )
 }
