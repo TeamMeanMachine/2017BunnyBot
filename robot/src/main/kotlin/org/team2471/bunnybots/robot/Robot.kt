@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.IterativeRobot
 import edu.wpi.first.wpilibj.networktables.NetworkTable
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.delay
+import kotlinx.coroutines.experimental.newFixedThreadPoolContext
 import kotlinx.coroutines.experimental.runBlocking
 import org.team2471.bunnybots.robot.subsystems.Arm
 import org.team2471.bunnybots.robot.subsystems.Drive
@@ -13,9 +14,7 @@ import java.util.concurrent.TimeUnit
 
 class Robot : IterativeRobot() {
     override fun robotInit() {
-        // use 2 threads in the common pool instead of 1
-        System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "2")
-        Command.initCoroutineContext(CommonPool)
+        Command.initCoroutineContext(newFixedThreadPoolContext(2, "Command Pool"))
 
         Drive
         Arm
