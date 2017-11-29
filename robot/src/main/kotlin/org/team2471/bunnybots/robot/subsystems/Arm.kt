@@ -16,7 +16,7 @@ object Arm {
 
     private const val SHOULDER_SCALE_TO_DEGREES = 90.0 / 250.0
     private const val SHOULDER_OFFSET = 170 // in SRX units
-    private const val WRIST_SCALE_TO_DEGREES = -90.0 / 0.658
+    private const val WRIST_GEAR_RATIO = 48.0/18.0
 
     private val shoulderMotors = CANTalon(RobotMap.Talons.ARM_SHOULDER_MOTOR_1).apply {
         changeControlMode(CANTalon.TalonControlMode.Position)
@@ -29,17 +29,14 @@ object Arm {
         reverseOutput(true)
         enableBrakeMode(true)
     })
+
     private val wristMotor = CANTalon(RobotMap.Talons.ARM_WRIST_MOTOR).apply {
         changeControlMode(CANTalon.TalonControlMode.Position)
         enableBrakeMode(true)
-        setFeedbackDevice(CANTalon.FeedbackDevice.CtreMagEncoder_Absolute)
+        setFeedbackDevice(CANTalon.FeedbackDevice.CtreMagEncoder_Relative)
         setPID(0.75, 0.0, 0.0)
-        //wristOffset = position
+        position = 0.0
         enable()
-    }
-
-    private val wristOffset = (wristMotor.position - 180 / WRIST_SCALE_TO_DEGREES).apply {
-        table.putNumber("Wrist Offset", this)
     }
 
     private val intakeMotor = CANTalon(RobotMap.Talons.ARM_INTAKE_MOTOR).apply {
@@ -62,16 +59,18 @@ object Arm {
 
     val shoulderError get() = shoulderAngle - shoulderUnitsToDegrees(shoulderMotors.setpoint)
 
-    var wristAngle: Double
+    private var wristAngle: Double
         get() = wristUnitsToDegrees(wristMotor.position)
         set(value) {
             val srxAngle = degreesToWristUnits(value)
             wristMotor.setpoint = srxAngle
+
             table.putNumber("Wrist Setpoint", value)
             table.putNumber("Wrist Error", wristError)
             table.putNumber("Wrist Position", wristAngle)
             table.putNumber("Wrist Output", wristMotor.outputVoltage)
         }
+
     val wristError get() = wristAngle - wristUnitsToDegrees(wristMotor.setpoint)
 
     val intakeCurrent get() = RobotMap.pdp.getCurrent(RobotMap.Talons.ARM_INTAKE_MOTOR)
@@ -85,8 +84,8 @@ object Arm {
                 table.putBoolean("Default Command running", true)
                 periodic {
                     intake = CoDriver.intake
-//               shoulderAngle = CoDriver.shoulder * 60 + 90
-//               wristAngle = CoDriver.wrist * 180
+                    shoulderAngle = CoDriver.shoulder * 60 + 90
+                    wristAngle = CoDriver.wrist * 180
                     table.putNumber("Intake Current", intakeCurrent)
                 }
             } finally {
@@ -96,14 +95,13 @@ object Arm {
     }
 
     // conversion functions
-    private fun degreesToWristUnits(angle: Double) = angle / WRIST_SCALE_TO_DEGREES + wristOffset
+    private fun degreesToWristUnits(angle: Double) = angle / 360 * WRIST_GEAR_RATIO
+
+    private fun wristUnitsToDegrees(angle: Double) = angle / WRIST_GEAR_RATIO * 360
 
     private fun degreesToShoulderUnits(angle: Double) = angle / SHOULDER_SCALE_TO_DEGREES + SHOULDER_OFFSET
 
-    private fun wristUnitsToDegrees(angle: Double) = (angle - wristOffset) * WRIST_SCALE_TO_DEGREES
-
     private fun shoulderUnitsToDegrees(angle: Double) = (angle - SHOULDER_OFFSET) * SHOULDER_SCALE_TO_DEGREES
-
 
     fun animateToPose(pose: Pose, time: Double) = Command(this) {
         val shoulderCurve = MotionCurve()
@@ -140,15 +138,14 @@ object Arm {
     // poses
     enum class Pose(val shoulderAngle: Double, val wristAngle: Double) {
 
-        IDLE(0.0, 180.0),
-        DUMP(20.0, 130.0),
-        SPIT(0.0, 135.0),
-        GRAB_UPRIGHT_BUCKET(-5.0, 5.0),
-        PRE_GRAB_FALLEN_BUCKET(40.0, -130.0),
-        GRAB_FALLEN_BUCKET(40.0, -110.0);
+        IDLE(0.0, 0.0),
+        DUMP(5.0, 40.0),
+        SPIT(90.0, 90.0),
+        GRAB_UPRIGHT_BUCKET(-5.0, 175.0),
+        PRE_GRAB_FALLEN_BUCKET(60.0, -30.0),
+        GRAB_FALLEN_BUCKET(40.0, -55.0);
 
         override fun toString(): String = "${super.toString()}(shoulderAngle=$shoulderAngle, wristAngle=$wristAngle)"
-
     }
 
 }

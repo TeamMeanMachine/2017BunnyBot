@@ -45,19 +45,15 @@ object Drive {
     private val rightMotors = CANTalon(Talons.DRIVE_RIGHT_MOTOR_3).apply {
         changeControlMode(CANTalon.TalonControlMode.PercentVbus)
         inverted = true
-        setVoltageRampRate(RAMP_RATE)
         setCurrentLimit(CURRENT_LIMIT)
         EnableCurrentLimit(true)
     } + CANTalon(Talons.DRIVE_RIGHT_MOTOR_2).apply {
-        setVoltageRampRate(RAMP_RATE)
         setCurrentLimit(CURRENT_LIMIT)
         EnableCurrentLimit(true)
     } + CANTalon(Talons.DRIVE_RIGHT_MOTOR_1).apply {
-        setVoltageRampRate(RAMP_RATE)
         setCurrentLimit(CURRENT_LIMIT)
         EnableCurrentLimit(true)
     } + CANTalon(Talons.DRIVE_RIGHT_MOTOR_4).apply {
-        setVoltageRampRate(RAMP_RATE)
         setCurrentLimit(CURRENT_LIMIT)
         EnableCurrentLimit(true)
     }
