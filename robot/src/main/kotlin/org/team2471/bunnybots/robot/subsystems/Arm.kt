@@ -79,7 +79,7 @@ object Arm {
 
 
     init {
-        registerDefaultCommand(CommonPool, Command(this) {
+        registerDefaultCommand(Command(this) {
             try {
                 table.putBoolean("Default Command running", true)
                 periodic {

@@ -64,7 +64,7 @@ object Drive {
     val rightDistance: Double get() = rightMotors.position
 
     init {
-        registerDefaultCommand(CommonPool, Command(this) {
+        registerDefaultCommand(Command(this) {
             periodic(15) {
                 drive(Driver.throttle, Driver.softTurn, Driver.hardTurn)
 
