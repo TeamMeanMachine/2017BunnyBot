@@ -2,7 +2,7 @@ package org.team2471.bunnybots.robot.subsystems
 
 import com.ctre.CANTalon
 import edu.wpi.first.wpilibj.networktables.NetworkTable
-import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.delay
 import org.team2471.bunnybots.plus
 import org.team2471.bunnybots.robot.CoDriver
 import org.team2471.bunnybots.robot.RobotMap
@@ -16,14 +16,19 @@ object Arm {
 
     private const val SHOULDER_SCALE_TO_DEGREES = 90.0 / 250.0
     private const val SHOULDER_OFFSET = 170 // in SRX units
-    private const val WRIST_GEAR_RATIO = 48.0/18.0
+    private const val WRIST_GEAR_RATIO = 48.0 / 18.0
+
+    private var wristWrapCount = 0
+    fun incrementWristWrapCount() {
+       wristWrapCount++
+    }
 
     private val shoulderMotors = CANTalon(RobotMap.Talons.ARM_SHOULDER_MOTOR_1).apply {
         changeControlMode(CANTalon.TalonControlMode.Position)
         enableBrakeMode(true)
         setFeedbackDevice(CANTalon.FeedbackDevice.AnalogPot)
         reverseOutput(true)
-        setPID(10.0, 0.0, 0.0)
+        setPID(12.5, 0.0, 0.0)
         enable()
     } + (CANTalon(RobotMap.Talons.ARM_SHOULDER_MOTOR_2).apply {
         reverseOutput(true)
@@ -34,7 +39,7 @@ object Arm {
         changeControlMode(CANTalon.TalonControlMode.Position)
         enableBrakeMode(true)
         setFeedbackDevice(CANTalon.FeedbackDevice.CtreMagEncoder_Relative)
-        setPID(0.75, 0.0, 0.0)
+        setPID(1.0, 0.0, 0.0)
         position = 0.0
         enable()
     }
@@ -60,7 +65,7 @@ object Arm {
     val shoulderError get() = shoulderAngle - shoulderUnitsToDegrees(shoulderMotors.setpoint)
 
     private var wristAngle: Double
-        get() = wristUnitsToDegrees(wristMotor.position)
+        get() = wristUnitsToDegrees(wristMotor.position) + wristWrapCount * 360
         set(value) {
             val srxAngle = degreesToWristUnits(value)
             wristMotor.setpoint = srxAngle
@@ -84,8 +89,8 @@ object Arm {
                 table.putBoolean("Default Command running", true)
                 periodic {
                     intake = CoDriver.intake
-                    shoulderAngle = CoDriver.shoulder * 60 + 90
-                    wristAngle = CoDriver.wrist * 180
+//                    shoulderAngle = CoDriver.shoulder * 60 + 90
+//                    wristAngle = CoDriver.wrist * 180
                     table.putNumber("Intake Current", intakeCurrent)
                 }
             } finally {
@@ -103,49 +108,78 @@ object Arm {
 
     private fun shoulderUnitsToDegrees(angle: Double) = (angle - SHOULDER_OFFSET) * SHOULDER_SCALE_TO_DEGREES
 
-    fun animateToPose(pose: Pose, time: Double) = Command(this) {
-        val shoulderCurve = MotionCurve()
-        val wristCurve = MotionCurve()
-        shoulderCurve.storeValue(0.0, shoulderAngle)
-        wristCurve.storeValue(0.0, wristAngle)
-        shoulderCurve.storeValue(time, pose.shoulderAngle)
-        wristCurve.storeValue(time, pose.wristAngle)
-
-        periodic(condition = { elapsedTimeSeconds < time }) {
-            val currentTime = elapsedTimeSeconds
-            shoulderAngle = shoulderCurve.getValue(currentTime)
-            wristAngle = wristCurve.getValue(currentTime)
+    fun playAnimation(animation: Animation) = Command(Arm) {
+        periodic(condition = { elapsedTimeSeconds < animation.length }) {
+            val time = elapsedTimeSeconds
+            shoulderAngle = animation.shoulderCurve.getValue(time)
+            wristAngle = animation.wristCurve.getValue(time)
         }
-
-        shoulderAngle = pose.shoulderAngle
-        wristAngle = pose.wristAngle
-
-        suspendUntil { Math.abs(shoulderError) < 3.0 && Math.abs(wristError) < 3.0 }
-    }
-
-    fun moveToPose(pose: Pose) = Command(this) {
-        table.putBoolean("moveToPose running", true)
-        shoulderAngle = pose.shoulderAngle
-        wristAngle = pose.wristAngle
-
-        println("Blocking to $pose")
-        suspendUntil { Math.abs(shoulderError) < 3.0 && Math.abs(wristError) < 3.0 }
-        println("Completed")
-
-        table.putBoolean("moveToPose running", false)
+        suspendUntil {
+            val shoulderError = shoulderError
+            val wristError = wristError
+            println("Errors: $shoulderError, $wristError")
+            Math.abs(shoulderError) < 3 && Math.abs(wristError) < 3
+        }
     }
 
     // poses
     enum class Pose(val shoulderAngle: Double, val wristAngle: Double) {
 
         IDLE(0.0, 0.0),
-        DUMP(5.0, 40.0),
-        SPIT(90.0, 90.0),
-        GRAB_UPRIGHT_BUCKET(-5.0, 175.0),
+        DUMP(5.0, -320.0),
+        SPIT(70.0, -270.0),
+        GRAB_UPRIGHT_BUCKET(0.0, -190.0),
         PRE_GRAB_FALLEN_BUCKET(60.0, -30.0),
-        GRAB_FALLEN_BUCKET(40.0, -55.0);
+        GRAB_FALLEN_BUCKET(40.0, -55.0),
+        IDLE_RESET(0.0, -360.0);
 
-        override fun toString(): String = "${super.toString()}(shoulderAngle=$shoulderAngle, wristAngle=$wristAngle)"
+//        override fun toString(): String = "${super.toString()}(shoulderAngle=$shoulderAngle, wristAngle=$wristAngle)"
     }
 
+    enum class Animation(vararg keyframes: Pair<Double, Pose>) {
+        IDLE_TO_GRAB_UPRIGHT_BUCKET(0.0 to Pose.IDLE, .75 to Pose.GRAB_FALLEN_BUCKET, 1.5 to Pose.GRAB_UPRIGHT_BUCKET),
+        GRAB_UPRIGHT_BUCKET_TO_DUMP(0.0 to Pose.GRAB_UPRIGHT_BUCKET, 1.0 to Pose.DUMP),
+        DUMP_TO_SPIT(0.0 to Pose.DUMP, 0.5 to Pose.SPIT),
+        SPIT_TO_IDLE(0.0 to Pose.SPIT, 1.0 to Pose.IDLE_RESET);
+
+        val shoulderCurve: MotionCurve = MotionCurve().apply {
+            keyframes.forEach { (time, pose) ->
+                storeValue(time, pose.shoulderAngle)
+            }
+        }
+        val wristCurve: MotionCurve = MotionCurve().apply {
+            keyframes.forEach { (time, pose) ->
+                storeValue(time, pose.wristAngle)
+            }
+        }
+        val length = shoulderCurve.length
+    }
 }
+
+// commands
+val intakeBucketCommand = Command(Arm) {
+    try {
+        fork(Arm.playAnimation(Arm.Animation.IDLE_TO_GRAB_UPRIGHT_BUCKET))
+        Arm.intake = 1.0
+        suspendUntil {
+            val current = Arm.intakeCurrent
+            println("Current: $current")
+            current > 30.0
+        }
+        println("Has bucket")
+        Arm.intake = 0.0
+
+        fork(Arm.playAnimation(Arm.Animation.GRAB_UPRIGHT_BUCKET_TO_DUMP))
+//        delay(750)
+
+        fork(Arm.playAnimation(Arm.Animation.DUMP_TO_SPIT))
+        Arm.intake = -0.5
+        delay(600)
+
+        fork(Arm.playAnimation(Arm.Animation.SPIT_TO_IDLE))
+        Arm.incrementWristWrapCount()
+    } finally {
+        Arm.intake = 0.0
+    }
+}
+

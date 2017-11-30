@@ -18,6 +18,7 @@ class Robot : IterativeRobot() {
 
         Drive
         Arm
+        CoDriver
     }
 
     override fun robotPeriodic() {
@@ -31,30 +32,6 @@ class Robot : IterativeRobot() {
     }
 
     override fun teleopInit() {
-        runBlocking(CommonPool) { Arm.moveToPose(Arm.Pose.IDLE).invokeAndJoin() }
-
-        // pick up bucket
-        Command(Arm) {
-            try {
-                Arm.animateToPose(Arm.Pose.GRAB_UPRIGHT_BUCKET, 1.0).invokeAndJoin()
-                Arm.intake = 1.0
-                suspendUntil {
-                    val current = Arm.intakeCurrent
-                    println("Current: $current")
-                    current > 20.0
-                }
-                println("Has bucket")
-                Arm.intake = 0.0
-                delay(2L, TimeUnit.SECONDS)
-                Arm.animateToPose(Arm.Pose.DUMP, 2.0).invokeAndJoin()
-                suspendUntil { CoDriver.isSpitting }
-                Arm.animateToPose(Arm.Pose.SPIT, 1.0).invokeAndJoin()
-                Arm.intake = -0.35
-                delay(500L, TimeUnit.MILLISECONDS)
-            } finally {
-                Arm.intake = 0.0
-            }
-        }//.invoke(CommonPool)
     }
 
     override fun teleopPeriodic() {

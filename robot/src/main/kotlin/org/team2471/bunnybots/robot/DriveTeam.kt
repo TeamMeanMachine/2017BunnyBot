@@ -1,6 +1,8 @@
 package org.team2471.bunnybots.robot
 
 import edu.wpi.first.wpilibj.XboxController
+import org.team2471.bunnybots.robot.subsystems.intakeBucketCommand
+import org.team2471.frc.lib.control.experimental.runWhen
 import org.team2471.frc.lib.math.deadband
 import org.team2471.frc.lib.math.squareWithSign
 
@@ -35,6 +37,9 @@ object CoDriver {
     val intake: Double
         get() = -controller.getRawAxis(2) + controller.getRawAxis(3)
 
-    val isSpitting get() = controller.getRawButton(3
-    )
+    val isSpitting get() = controller.getRawButton(3)
+
+    init {
+        intakeBucketCommand.runWhen { controller.aButton }
+    }
 }
