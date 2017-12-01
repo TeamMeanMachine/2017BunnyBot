@@ -2,6 +2,8 @@ package org.team2471.bunnybots.robot
 
 import edu.wpi.first.wpilibj.XboxController
 import org.team2471.bunnybots.robot.subsystems.intakeBucketCommand
+import org.team2471.bunnybots.robot.subsystems.intakeFallenBucketCommand
+import org.team2471.bunnybots.robot.subsystems.preIntakeFallenBucketCommand
 import org.team2471.frc.lib.control.experimental.runWhen
 import org.team2471.frc.lib.math.deadband
 import org.team2471.frc.lib.math.squareWithSign
@@ -41,5 +43,7 @@ object CoDriver {
 
     init {
         intakeBucketCommand.runWhen { controller.aButton }
+        preIntakeFallenBucketCommand.runWhen { controller.bButton }
+        intakeFallenBucketCommand.runWhen { controller.yButton }
     }
 }
