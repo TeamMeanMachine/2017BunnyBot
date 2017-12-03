@@ -1,13 +1,17 @@
 package org.team2471.bunnybots.robot.subsystems
 
 import com.ctre.CANTalon
+import com.sun.org.apache.xpath.internal.operations.Bool
+import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj.networktables.NetworkTable
 import kotlinx.coroutines.experimental.delay
 import org.team2471.bunnybots.plus
 import org.team2471.bunnybots.robot.CoDriver
 import org.team2471.bunnybots.robot.RobotMap
 import org.team2471.frc.lib.control.experimental.Command
+import org.team2471.frc.lib.control.experimental.periodic
 import org.team2471.frc.lib.control.experimental.registerDefaultCommand
+import org.team2471.frc.lib.control.experimental.suspendUntil
 import org.team2471.frc.lib.motion_profiling.MotionCurve
 
 
@@ -36,10 +40,10 @@ object Arm {
         enableBrakeMode(true)
         setFeedbackDevice(CANTalon.FeedbackDevice.CtreMagEncoder_Relative)
         setPID(1.5, 0.0, 0.1)
-        println( "Position Before: " + position + " EncPosition: " + pulseWidthPosition)
+        println("Position Before: $position EncPosition: $pulseWidthPosition")
         position = 0.0
 
-        println( "Position After: " + position + " EncPosition: " + pulseWidthPosition)
+        println("Position After: $position EncPosition: $pulseWidthPosition")
         //position = (pulseWidthPosition + WRIST_OFFSET) / 4096.0
         enable()
     }
@@ -93,18 +97,21 @@ object Arm {
 
 
     init {
-        registerDefaultCommand(Command(this) {
-            try {
-                table.putBoolean("Default Command running", true)
-                periodic {
-                    intake = CoDriver.intake
- //                   shoulderAngle = CoDriver.shoulder * 60 + 90
-//                    wristAngle = CoDriver.wrist * 180
-                    table.putNumber("Intake Current", intakeCurrent)
-                }
-            } finally {
-                table.putBoolean("Default Command running", false)
+        registerDefaultCommand(Command("Arm Default" , this) {
+            var wristAngle = wristAngle
+            while(wristAngle > 180)
+                wristAngle -= 360
+            while (wristAngle < -180)
+                wristAngle +=360
+            val animation = if (wristAngle < -60 && wristAngle > -180){
+                Animation(0.0 to currentPose, 0.5 to Pose(45.0, 90.0), 1.0 to Pose.IDLE)
             }
+            else {
+                Animation(0.0 to currentPose, 0.5 to Pose.IDLE)
+            }
+            Arm.playAnimation(animation)
+
+            delay(Long.MAX_VALUE)
         })
     }
 
@@ -117,9 +124,11 @@ object Arm {
 
     private fun shoulderUnitsToDegrees(angle: Double) = (angle - SHOULDER_OFFSET) * SHOULDER_SCALE_TO_DEGREES
 
-    fun playAnimation(animation: Animation) = Command(Arm) {
-        periodic(condition = { elapsedTimeSeconds < animation.length }) {
-            val time = elapsedTimeSeconds
+    suspend fun playAnimation(animation: Animation) {
+        val startTime = Timer.getFPGATimestamp()
+
+        periodic(condition = { Timer.getFPGATimestamp() - startTime < animation.length }) {
+            val time = Timer.getFPGATimestamp() - startTime
             shoulderAngle = animation.shoulderCurve.getValue(time)
             wristAngle = animation.wristCurve.getValue(time)
         }
@@ -132,26 +141,35 @@ object Arm {
     }
 
     // poses
-    enum class Pose(val shoulderAngle: Double, val wristAngle: Double) {
+    class Pose(val shoulderAngle: Double, val wristAngle: Double) {
+        companion object {
 
-        IDLE(0.0, 0.0),
-        DUMP(5.0, 50.0),
-        SPIT(70.0, 90.0),
-        GRAB_UPRIGHT_BUCKET(0.0, 170.0),
-        PRE_GRAB_FALLEN_BUCKET(75.0, -50.0),
-        GRAB_FALLEN_BUCKET(35.0, -55.0),
-        FALLEN_BUCKET_MID(50.0, 170.0)
-//        override fun toString(): String = "${super.toString()}(shoulderAngle=$shoulderAngle, wristAngle=$wristAngle)"
+            val IDLE = Pose(0.0, 0.0)
+            val DUMP = Pose(5.0, 50.0)
+            val SPIT = Pose(70.0, 90.0)
+            val GRAB_UPRIGHT_BUCKET = Pose(0.0, 170.0)
+            val PRE_GRAB_FALLEN_BUCKET = Pose(75.0, -50.0)
+            val GRAB_FALLEN_BUCKET = Pose(35.0, -55.0)
+            val FALLEN_BUCKET_MID = Pose(50.0, 170.0)
+        }
+
+//        operator fun equals(pose: Pose): Boolean {
+//            return Math.abs(shoulderAngle - pose.shoulderAngle)< 3.0 && Math.abs(wristAngle - pose.wristAngle)< 3.0
+//        }
     }
+    val currentPose get() = Pose(shoulderAngle, wristAngle)
 
-    enum class Animation(vararg keyframes: Pair<Double, Pose>) {
-        IDLE_TO_GRAB_UPRIGHT_BUCKET(0.0 to Pose.IDLE, .75 to Pose.GRAB_FALLEN_BUCKET, 1.5 to Pose.GRAB_UPRIGHT_BUCKET),
-        GRAB_UPRIGHT_BUCKET_TO_DUMP(0.0 to Pose.GRAB_UPRIGHT_BUCKET, 1.0 to Pose.DUMP),
-        DUMP_TO_SPIT(0.0 to Pose.DUMP, 0.5 to Pose.SPIT),
-        SPIT_TO_IDLE(0.0 to Pose.SPIT, 1.0 to Pose.IDLE),
-        IDLE_TO_PRE_GRAB_FALLEN_BUCKET(0.0 to Pose.IDLE, .75 to Pose.PRE_GRAB_FALLEN_BUCKET),
-        PRE_GRAB_TO_GRAB_FALLEN_BUCKET(0.0 to Pose.PRE_GRAB_FALLEN_BUCKET, 0.375 to Pose.GRAB_FALLEN_BUCKET),
-        GRAB_FALLEN_BUCKET_TO_DUMP(0.0 to Pose.GRAB_FALLEN_BUCKET, 0.5 to Pose.FALLEN_BUCKET_MID, 1.0 to Pose.DUMP);
+    class Animation(vararg keyframes: Pair<Double, Pose>) {
+        companion object {
+            val IDLE_TO_GRAB_UPRIGHT_BUCKET = Animation(0.0 to Pose.IDLE, .75 to Pose.GRAB_FALLEN_BUCKET, 1.5 to Pose.GRAB_UPRIGHT_BUCKET)
+            val GRAB_UPRIGHT_BUCKET_TO_DUMP = Animation(0.0 to Pose.GRAB_UPRIGHT_BUCKET, 1.0 to Pose.DUMP)
+            val DUMP_TO_SPIT = Animation(0.0 to Pose.DUMP, 0.5 to Pose.SPIT)
+            val SPIT_TO_IDLE = Animation(0.0 to Pose.SPIT, 1.0 to Pose.IDLE)
+            val IDLE_TO_PRE_GRAB_FALLEN_BUCKET = Animation(0.0 to Pose.IDLE, .75 to Pose.PRE_GRAB_FALLEN_BUCKET)
+            val PRE_GRAB_TO_GRAB_FALLEN_BUCKET = Animation(0.0 to Pose.PRE_GRAB_FALLEN_BUCKET, 0.375 to Pose.GRAB_FALLEN_BUCKET)
+            val GRAB_FALLEN_BUCKET_TO_DUMP = Animation(0.0 to Pose.GRAB_FALLEN_BUCKET, 0.5 to Pose.FALLEN_BUCKET_MID, 1.0 to Pose.DUMP)
+
+        }
 
         val shoulderCurve: MotionCurve = MotionCurve().apply {
             keyframes.forEach { (time, pose) ->
@@ -171,65 +189,5 @@ object Arm {
             }
         }
         val length = shoulderCurve.length
-    }
-}
-
-// commands
-val intakeBucketCommand = Command(Arm) {
-    try {
-        fork(Arm.playAnimation(Arm.Animation.IDLE_TO_GRAB_UPRIGHT_BUCKET))
-        Arm.intake = 1.0
-        suspendUntil {
-            val current = Arm.intakeCurrent
-            //println("Current: $current")
-            current > 30.0
-        }
-        println("Has bucket")
-        Arm.intake = 0.0
-
-        fork(Arm.playAnimation(Arm.Animation.GRAB_UPRIGHT_BUCKET_TO_DUMP))
-//        delay(750)
-
-        fork(Arm.playAnimation(Arm.Animation.DUMP_TO_SPIT))
-        Arm.intake = -0.75
-        delay(600)
-
-        fork(Arm.playAnimation(Arm.Animation.SPIT_TO_IDLE))
-    } finally {
-        Arm.intake = 0.0
-    }
-}
-
-val preIntakeFallenBucketCommand = Command(Arm) {
-    try {
-        fork(Arm.playAnimation(Arm.Animation.IDLE_TO_PRE_GRAB_FALLEN_BUCKET))
-    } finally {
-        Arm.intake = 0.0
-    }
-}
-
-val intakeFallenBucketCommand = Command(Arm) {
-    try {
-        Arm.intake = 1.0
-        fork(Arm.playAnimation(Arm.Animation.PRE_GRAB_TO_GRAB_FALLEN_BUCKET))
-
-        suspendUntil {
-            val current = Arm.intakeCurrent
-            //println("Current: $current")
-            current > 30.0
-        }
-        println("Has bucket")
-        Arm.intake = 0.0
-
-        fork(Arm.playAnimation(Arm.Animation.GRAB_FALLEN_BUCKET_TO_DUMP))
-//        delay(750)
-
-        fork(Arm.playAnimation(Arm.Animation.DUMP_TO_SPIT))
-        Arm.intake = -0.75
-        delay(600)
-
-        fork(Arm.playAnimation(Arm.Animation.SPIT_TO_IDLE))
-    } finally {
-        Arm.intake = 0.0
     }
 }

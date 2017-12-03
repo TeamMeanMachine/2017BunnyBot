@@ -8,6 +8,7 @@ import org.team2471.bunnybots.plus
 import org.team2471.bunnybots.robot.Driver
 import org.team2471.bunnybots.robot.RobotMap
 import org.team2471.frc.lib.control.experimental.Command
+import org.team2471.frc.lib.control.experimental.periodic
 import org.team2471.frc.lib.control.experimental.registerDefaultCommand
 import org.team2471.bunnybots.robot.RobotMap.Talons as Talons
 
@@ -64,7 +65,7 @@ object Drive {
     val rightDistance: Double get() = rightMotors.position
 
     init {
-        registerDefaultCommand(Command(this) {
+        registerDefaultCommand(Command("Drive Default",this) {
             periodic(15) {
                 drive(Driver.throttle, Driver.softTurn, Driver.hardTurn)
 
