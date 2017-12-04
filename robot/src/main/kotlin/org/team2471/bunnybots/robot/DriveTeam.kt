@@ -1,7 +1,9 @@
 package org.team2471.bunnybots.robot
 
 import edu.wpi.first.wpilibj.XboxController
+import org.team2471.bunnybots.robot.subsystems.Arm.emergencyMode
 import org.team2471.frc.lib.control.experimental.runWhen
+import org.team2471.frc.lib.control.experimental.toggleWhen
 import org.team2471.frc.lib.math.deadband
 import org.team2471.frc.lib.math.squareWithSign
 
@@ -38,10 +40,14 @@ object CoDriver {
 
     val isSpitting get() = controller.getRawButton(3)
 
+    val fallenBucket get() = controller.getRawButton(2)
+
+
     init {
         intakeBucketCommand.runWhen { controller.aButton }
         preIntakeFallenBucketCommand.runWhen { controller.bButton }
         intakeFallenBucketCommand.runWhen { controller.yButton }
         cancelArmCommand.runWhen { controller.xButton }
+        emergencyMode.toggleWhen { controller.backButton }
     }
 }
