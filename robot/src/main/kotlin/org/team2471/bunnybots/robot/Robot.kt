@@ -26,6 +26,7 @@ class Robot : IterativeRobot() {
     }
 
     override fun autonomousInit() {
+        SimpleAuto()
     }
 
     override fun autonomousPeriodic() {

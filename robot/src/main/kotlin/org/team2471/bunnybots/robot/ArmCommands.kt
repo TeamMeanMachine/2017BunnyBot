@@ -3,24 +3,22 @@ package org.team2471.bunnybots.robot
 import kotlinx.coroutines.experimental.delay
 import org.team2471.bunnybots.robot.subsystems.Arm
 import org.team2471.frc.lib.control.experimental.Command
-import org.team2471.frc.lib.control.experimental.periodic
 import org.team2471.frc.lib.control.experimental.suspendUntil
-
 // commands
+const val AMPERAGE_LIMIT = 21.0
 val intakeBucketCommand = Command("Intake Bucket", Arm) {
     try {
         Arm.playAnimation(Arm.Animation.IDLE_TO_GRAB_UPRIGHT_BUCKET)
         Arm.intake = 1.0
         suspendUntil {
             val current = Arm.intakeCurrent
-            //println("Current: $current")
-            current > 30.0
+            println("Current: $current")
+            current > AMPERAGE_LIMIT
         }
         println("Has bucket")
         Arm.intake = 0.0
 
         Arm.playAnimation(Arm.Animation.GRAB_UPRIGHT_BUCKET_TO_DUMP)
-//        delay(750)
 
         Arm.playAnimation(Arm.Animation.DUMP_TO_SPIT)
         Arm.intake = -0.75
@@ -45,7 +43,7 @@ val intakeFallenBucketCommand = Command("Intake Fallen Bucket", Arm) {
         suspendUntil {
             val current = Arm.intakeCurrent
             //println("Current: $current")
-            current > 30.0
+            current > AMPERAGE_LIMIT
         }
         delay(700)
         println("Has bucket")
@@ -68,20 +66,20 @@ val intakeFallenBucketCommand2 = Command("Intake Fallen Bucket", Arm){
     try {
         Arm.playAnimation(Arm.Animation.IDLE_TO_PRE_GRAB_FALLEN_BUCKET)
         Arm.intake = 0.5
-        suspendUntil { CoDriver.fallenBucket }
+        suspendUntil { CoDriver.dipForFallenBucket }
         Arm.intake = 1.0
         Arm.playAnimation(Arm.Animation.PRE_GRAB_TO_GRAB_FALLEN_BUCKET)
         suspendUntil {
-            if (Arm.intakeCurrent > 30) return@suspendUntil true
+            if (Arm.intakeCurrent > AMPERAGE_LIMIT) return@suspendUntil true
 
-            if (!CoDriver.fallenBucket) {
+            if (!CoDriver.dipForFallenBucket) {
                 Arm.playAnimation(Arm.Animation.BACK_TO_PRE_GRAB_FALLEN_BUCKET)
-                suspendUntil { CoDriver.fallenBucket }
+                suspendUntil { CoDriver.dipForFallenBucket }
                 Arm.playAnimation(Arm.Animation.PRE_GRAB_TO_GRAB_FALLEN_BUCKET)
             }
             false
         }
-        delay(700)
+        delay(600)
         println("Has bucket")
         Arm.intake = 0.0
 
