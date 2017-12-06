@@ -1,7 +1,6 @@
 package org.team2471.bunnybots.robot.subsystems
 
 import com.ctre.CANTalon
-import com.sun.org.apache.xpath.internal.operations.Bool
 import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj.networktables.NetworkTable
 import kotlinx.coroutines.experimental.delay
@@ -9,8 +8,8 @@ import org.team2471.bunnybots.plus
 import org.team2471.bunnybots.robot.CoDriver
 import org.team2471.bunnybots.robot.RobotMap
 import org.team2471.frc.lib.control.experimental.Command
+import org.team2471.frc.lib.control.experimental.CommandSystem
 import org.team2471.frc.lib.control.experimental.periodic
-import org.team2471.frc.lib.control.experimental.registerDefaultCommand
 import org.team2471.frc.lib.control.experimental.suspendUntil
 import org.team2471.frc.lib.motion_profiling.MotionCurve
 
@@ -97,7 +96,7 @@ object Arm {
 
 
     init {
-        registerDefaultCommand(Command("Arm Default" , this) {
+        CommandSystem.registerDefaultCommand(this, Command("Arm Default" , this) {
             var wristAngle = wristAngle
             intake = 0.0
             while(wristAngle > 180)
