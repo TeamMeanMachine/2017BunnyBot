@@ -2,6 +2,7 @@ package org.team2471.bunnybots.robot.subsystems
 
 import com.ctre.CANTalon
 import edu.wpi.first.wpilibj.Solenoid
+import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj.networktables.NetworkTable
 import org.team2471.bunnybots.plus
 import org.team2471.bunnybots.robot.Driver
@@ -9,6 +10,7 @@ import org.team2471.bunnybots.robot.RobotMap
 import org.team2471.frc.lib.control.experimental.Command
 import org.team2471.frc.lib.control.experimental.CommandSystem
 import org.team2471.frc.lib.control.experimental.periodic
+import org.team2471.frc.lib.motion_profiling.MotionCurve
 import org.team2471.bunnybots.robot.RobotMap.Talons as Talons
 
 
@@ -24,6 +26,9 @@ object Drive {
     private val shifter = Solenoid(0)
 
     private val leftMotors = CANTalon(Talons.DRIVE_LEFT_MOTOR_1).apply {
+        reverseSensor(true)
+        configEncoderCodesPerRev(216)
+        setPID(1.8, 0.0, 0.1)
         changeControlMode(CANTalon.TalonControlMode.PercentVbus)
         setVoltageRampRate(RAMP_RATE)
         setCurrentLimit(CURRENT_LIMIT)
@@ -43,6 +48,9 @@ object Drive {
     }
 
     private val rightMotors = CANTalon(Talons.DRIVE_RIGHT_MOTOR_3).apply {
+        reverseOutput(true)
+        configEncoderCodesPerRev(216)
+        setPID(1.8, 0.0, 0.1)
         changeControlMode(CANTalon.TalonControlMode.PercentVbus)
         inverted = true
         setCurrentLimit(CURRENT_LIMIT)
@@ -65,7 +73,7 @@ object Drive {
 
     init {
         CommandSystem.registerDefaultCommand(this, Command("Drive Default",this) {
-            periodic(15) {
+            periodic {
                 drive(Driver.throttle, Driver.softTurn, Driver.hardTurn)
 
                 val leftAmperage = listOf(Talons.DRIVE_LEFT_MOTOR_1, Talons.DRIVE_LEFT_MOTOR_2,
@@ -114,6 +122,60 @@ object Drive {
 
     fun driveStraight(throttle: Double, shiftSetting: ShiftSetting = ShiftSetting.AUTOMATIC) =
             drive(throttle, 0.0, 0.0, shiftSetting)
+
+    suspend fun driveDistance (distance:Double,time:Double){
+        val curve = MotionCurve()
+        curve.storeValue(0.0, 0.0)
+        curve.storeValue(time, distance)
+        try {
+            leftMotors.changeControlMode(CANTalon.TalonControlMode.Position)
+            rightMotors.changeControlMode(CANTalon.TalonControlMode.Position)
+
+            val startLeftPosition = leftMotors.position
+            val startRightPosition = rightMotors.position
+
+            val timer = Timer().apply { start() }
+            periodic(condition = { timer.get() <= time }) {
+                val t = timer.get()
+                leftMotors.setpoint = startLeftPosition + curve.getValue(t)
+                rightMotors.setpoint = startRightPosition + curve.getValue(t)
+            }
+        } finally {
+            leftMotors.changeControlMode(CANTalon.TalonControlMode.PercentVbus)
+            rightMotors.changeControlMode(CANTalon.TalonControlMode.PercentVbus)
+        }
+    }
+
+    val testCommand = Command("Drive Test Command", this) {
+        try {
+            leftMotors.changeControlMode(CANTalon.TalonControlMode.Position)
+            rightMotors.changeControlMode(CANTalon.TalonControlMode.Position)
+            val startLeftDistance = leftMotors.position
+            val startRightDistance = rightMotors.position
+
+            val table = NetworkTable.getTable("Drive PID Test")
+            table.putNumber("Left P", leftMotors.p)
+            table.putNumber("Left D", leftMotors.d)
+            table.putNumber("Right P", rightMotors.p)
+            table.putNumber("Right D", rightMotors.d)
+            periodic(100) {
+                leftMotors.p = table.getNumber("Left P", 0.0)
+                leftMotors.d = table.getNumber("Left D", 0.0)
+
+                rightMotors.p = table.getNumber("Right P", 0.0)
+                rightMotors.d = table.getNumber("Right D", 0.0)
+
+                val setpoint = Driver.throttle * 3
+                leftMotors.setpoint = startLeftDistance + setpoint
+                rightMotors.setpoint = startRightDistance + setpoint
+                println("Setpoint: $setpoint")
+            }
+        } finally {
+            leftMotors.changeControlMode(CANTalon.TalonControlMode.PercentVbus)
+            rightMotors.changeControlMode(CANTalon.TalonControlMode.PercentVbus)
+        }
+
+    }
 
     enum class ShiftSetting {
         AUTOMATIC,

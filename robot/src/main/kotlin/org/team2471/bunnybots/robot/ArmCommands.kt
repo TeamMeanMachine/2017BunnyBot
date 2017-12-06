@@ -21,7 +21,7 @@ val intakeBucketCommand = Command("Intake Bucket", Arm) {
         Arm.playAnimation(Arm.Animation.GRAB_UPRIGHT_BUCKET_TO_DUMP)
 
         Arm.playAnimation(Arm.Animation.DUMP_TO_SPIT)
-        Arm.intake = -0.75
+        Arm.intake = -1.0
         delay(600)
 
         Arm.playAnimation(Arm.Animation.SPIT_TO_IDLE)
@@ -30,39 +30,7 @@ val intakeBucketCommand = Command("Intake Bucket", Arm) {
     }
 }
 
-val preIntakeFallenBucketCommand = Command("Pre Intake Bucket", Arm) {
-    Arm.playAnimation(Arm.Animation.IDLE_TO_PRE_GRAB_FALLEN_BUCKET)
-    delay(Long.MAX_VALUE)
-}
-
-val intakeFallenBucketCommand = Command("Intake Fallen Bucket", Arm) {
-    try {
-        Arm.intake = 1.0
-        Arm.playAnimation(Arm.Animation.PRE_GRAB_TO_GRAB_FALLEN_BUCKET)
-
-        suspendUntil {
-            val current = Arm.intakeCurrent
-            //println("Current: $current")
-            current > AMPERAGE_LIMIT
-        }
-        delay(700)
-        println("Has bucket")
-        Arm.intake = 0.0
-
-        Arm.playAnimation(Arm.Animation.GRAB_FALLEN_BUCKET_TO_DUMP)
-//        delay(750)
-
-        Arm.playAnimation(Arm.Animation.DUMP_TO_SPIT)
-        Arm.intake = -0.75
-        delay(600)
-
-        Arm.playAnimation(Arm.Animation.SPIT_TO_IDLE)
-    } finally {
-        Arm.intake = 0.0
-    }
-}
-
-val intakeFallenBucketCommand2 = Command("Intake Fallen Bucket", Arm){
+val intakeFallenBucketCommand = Command("Intake Fallen Bucket", Arm){
     try {
         Arm.playAnimation(Arm.Animation.IDLE_TO_PRE_GRAB_FALLEN_BUCKET)
         Arm.intake = 0.5
@@ -95,5 +63,12 @@ val intakeFallenBucketCommand2 = Command("Intake Fallen Bucket", Arm){
     }
 }
 
-val cancelArmCommand = Command("Interrupt Arm", Arm) {}
+val cancelArmCommand = Command("Interrupt Arm", Arm) {
+    try {
+        Arm.intake = -1.0
+        delay(700)
+    } finally {
+        Arm.intake = 0.0
+    }
+}
 

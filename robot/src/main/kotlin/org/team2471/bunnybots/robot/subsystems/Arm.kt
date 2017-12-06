@@ -140,6 +140,12 @@ object Arm {
         }
     }
 
+    suspend fun waitForBucket (){
+        suspendUntil { intakeCurrent>18}
+        delay(350)
+        if (intakeCurrent<18) waitForBucket()
+    }
+
     // poses
     class Pose(val shoulderAngle: Double, val wristAngle: Double) {
         companion object {
@@ -153,10 +159,6 @@ object Arm {
             val GRAB_FALLEN_BUCKET = Pose(35.0, -70.0)
             val FALLEN_BUCKET_MID = Pose(50.0, 170.0)
         }
-
-//        operator fun equals(pose: Pose): Boolean {
-//            return Math.abs(shoulderAngle - pose.shoulderAngle)< 3.0 && Math.abs(wristAngle - pose.wristAngle)< 3.0
-//        }
     }
     val currentPose get() = Pose(shoulderAngle, wristAngle)
 
@@ -164,8 +166,8 @@ object Arm {
         companion object {
             val IDLE_TO_GRAB_UPRIGHT_BUCKET = Animation(0.0 to Pose.IDLE, 0.5 to Pose.GRAB_UPRIGHT_MID, 1.0 to Pose.GRAB_UPRIGHT_BUCKET)
             val GRAB_UPRIGHT_BUCKET_TO_DUMP = Animation(0.0 to Pose.GRAB_UPRIGHT_BUCKET, 0.5 to Pose.DUMP)
-            val DUMP_TO_SPIT = Animation(0.0 to Pose.DUMP, 0.25 to Pose.SPIT)
-            val SPIT_TO_IDLE = Animation(0.0 to Pose.SPIT, 0.75 to Pose.IDLE)
+            val DUMP_TO_SPIT = Animation(0.0 to Pose.DUMP, 0.25 to Pose.DUMP)
+            val SPIT_TO_IDLE = Animation(0.0 to Pose.DUMP, 0.75 to Pose.IDLE)
             val IDLE_TO_PRE_GRAB_FALLEN_BUCKET = Animation(0.0 to Pose.IDLE, 0.5 to Pose.PRE_GRAB_FALLEN_BUCKET)
             val PRE_GRAB_TO_GRAB_FALLEN_BUCKET = Animation(0.0 to Pose.PRE_GRAB_FALLEN_BUCKET, 0.25 to Pose.GRAB_FALLEN_BUCKET)
             val GRAB_FALLEN_BUCKET_TO_DUMP = Animation(0.0 to Pose.GRAB_FALLEN_BUCKET, 0.375 to Pose.FALLEN_BUCKET_MID, 0.75 to Pose.DUMP)

@@ -27,6 +27,7 @@ class Robot : IterativeRobot() {
     }
 
     override fun autonomousInit() {
+        CommandSystem.isEnabled = true
         SimpleAuto()
     }
 
@@ -34,14 +35,20 @@ class Robot : IterativeRobot() {
     }
 
     override fun teleopInit() {
+        CommandSystem.isEnabled = true
     }
 
     override fun teleopPeriodic() {
     }
 
     override fun testInit() {
+        CommandSystem.isEnabled = true
     }
 
     override fun testPeriodic() {
+    }
+
+    override fun disabledInit() {
+        CommandSystem.isEnabled = false
     }
 }
