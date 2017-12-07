@@ -2,6 +2,8 @@ package org.team2471.bunnybots.robot
 
 import edu.wpi.first.wpilibj.XboxController
 import org.team2471.bunnybots.robot.subsystems.Arm.emergencyMode
+import org.team2471.bunnybots.robot.subsystems.Drive
+import org.team2471.frc.lib.control.experimental.Command
 import org.team2471.frc.lib.control.experimental.runWhen
 import org.team2471.frc.lib.control.experimental.toggleWhen
 import org.team2471.frc.lib.math.deadband
@@ -20,6 +22,10 @@ object Driver {
 
     val hardTurn: Double
         get() = -controller.getRawAxis(2) + controller.getRawAxis(3)
+
+    init {
+        Command("", Drive) { Drive.driveDistance(3.0, 3.0) }.runWhen { controller.xButton }
+    }
 }
 
 object CoDriver {
@@ -40,13 +46,13 @@ object CoDriver {
 
     val isSpitting get() = controller.getRawButton(3)
 
-    val fallenBucket get() = controller.getRawButton(2)
+    val dipForFallenBucket get() = controller.yButton
 
 
     init {
         intakeBucketCommand.runWhen { controller.aButton }
-        preIntakeFallenBucketCommand.runWhen { controller.bButton }
-        intakeFallenBucketCommand.runWhen { controller.yButton }
+        //preIntakeFallenBucketCommand.runWhen { controller.bButton }
+        intakeFallenBucketCommand.runWhen { controller.bButton }
         cancelArmCommand.runWhen { controller.xButton }
         emergencyMode.toggleWhen { controller.backButton }
     }

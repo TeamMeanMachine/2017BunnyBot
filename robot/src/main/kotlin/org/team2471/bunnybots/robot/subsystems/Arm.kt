@@ -1,7 +1,6 @@
 package org.team2471.bunnybots.robot.subsystems
 
 import com.ctre.CANTalon
-import com.sun.org.apache.xpath.internal.operations.Bool
 import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj.networktables.NetworkTable
 import kotlinx.coroutines.experimental.delay
@@ -9,8 +8,8 @@ import org.team2471.bunnybots.plus
 import org.team2471.bunnybots.robot.CoDriver
 import org.team2471.bunnybots.robot.RobotMap
 import org.team2471.frc.lib.control.experimental.Command
+import org.team2471.frc.lib.control.experimental.CommandSystem
 import org.team2471.frc.lib.control.experimental.periodic
-import org.team2471.frc.lib.control.experimental.registerDefaultCommand
 import org.team2471.frc.lib.control.experimental.suspendUntil
 import org.team2471.frc.lib.motion_profiling.MotionCurve
 
@@ -97,8 +96,9 @@ object Arm {
 
 
     init {
-        registerDefaultCommand(Command("Arm Default" , this) {
+        CommandSystem.registerDefaultCommand(this, Command("Arm Default" , this) {
             var wristAngle = wristAngle
+            intake = 0.0
             while(wristAngle > 180)
                 wristAngle -= 360
             while (wristAngle < -180)
@@ -140,23 +140,25 @@ object Arm {
         }
     }
 
+    suspend fun waitForBucket (){
+        suspendUntil { intakeCurrent>18}
+        delay(350)
+        if (intakeCurrent<18) waitForBucket()
+    }
+
     // poses
     class Pose(val shoulderAngle: Double, val wristAngle: Double) {
         companion object {
 
-            val IDLE = Pose(0.0, 0.0)
+            val IDLE = Pose(10.0, 0.0)
             val DUMP = Pose(5.0, 50.0)
-            val SPIT = Pose(70.0, 90.0)
+            val SPIT = Pose(25.0, 70.0)
             val GRAB_UPRIGHT_BUCKET = Pose(0.0, 180.0)
             val GRAB_UPRIGHT_MID = Pose(35.0, -75.0)
             val PRE_GRAB_FALLEN_BUCKET = Pose(75.0, -50.0)
-            val GRAB_FALLEN_BUCKET = Pose(35.0, -55.0)
+            val GRAB_FALLEN_BUCKET = Pose(35.0, -70.0)
             val FALLEN_BUCKET_MID = Pose(50.0, 170.0)
         }
-
-//        operator fun equals(pose: Pose): Boolean {
-//            return Math.abs(shoulderAngle - pose.shoulderAngle)< 3.0 && Math.abs(wristAngle - pose.wristAngle)< 3.0
-//        }
     }
     val currentPose get() = Pose(shoulderAngle, wristAngle)
 
@@ -170,7 +172,7 @@ object Arm {
             val PRE_GRAB_TO_GRAB_FALLEN_BUCKET = Animation(0.0 to Pose.PRE_GRAB_FALLEN_BUCKET, 0.25 to Pose.GRAB_FALLEN_BUCKET)
             val GRAB_FALLEN_BUCKET_TO_DUMP = Animation(0.0 to Pose.GRAB_FALLEN_BUCKET, 0.375 to Pose.FALLEN_BUCKET_MID, 0.75 to Pose.DUMP)
             val BACK_TO_PRE_GRAB_FALLEN_BUCKET = Animation(0.0 to Pose.GRAB_FALLEN_BUCKET, 0.5 to Pose.PRE_GRAB_FALLEN_BUCKET)
-
+            val QUICK_RESET_GRAB_UPRIGHT_BUCKET = Animation(0.0 to Pose.SPIT, 0.5 to Pose.GRAB_UPRIGHT_BUCKET)
         }
 
         val shoulderCurve: MotionCurve = MotionCurve().apply {
@@ -199,6 +201,7 @@ object Arm {
             periodic {
                 shoulderMotors.set(CoDriver.shoulder)
                 wristMotor.set(CoDriver.wrist)
+                intake = CoDriver.intake
             }
         } finally {
             shoulderMotors.changeControlMode(CANTalon.TalonControlMode.Position)
