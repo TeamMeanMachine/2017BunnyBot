@@ -152,7 +152,7 @@ object Arm {
 
             val IDLE = Pose(10.0, 0.0)
             val DUMP = Pose(5.0, 50.0)
-            val SPIT = Pose(70.0, 90.0)
+            val SPIT = Pose(25.0, 50.0)
             val GRAB_UPRIGHT_BUCKET = Pose(0.0, 180.0)
             val GRAB_UPRIGHT_MID = Pose(35.0, -75.0)
             val PRE_GRAB_FALLEN_BUCKET = Pose(75.0, -50.0)
@@ -166,8 +166,8 @@ object Arm {
         companion object {
             val IDLE_TO_GRAB_UPRIGHT_BUCKET = Animation(0.0 to Pose.IDLE, 0.5 to Pose.GRAB_UPRIGHT_MID, 1.0 to Pose.GRAB_UPRIGHT_BUCKET)
             val GRAB_UPRIGHT_BUCKET_TO_DUMP = Animation(0.0 to Pose.GRAB_UPRIGHT_BUCKET, 0.5 to Pose.DUMP)
-            val DUMP_TO_SPIT = Animation(0.0 to Pose.DUMP, 0.25 to Pose.DUMP)
-            val SPIT_TO_IDLE = Animation(0.0 to Pose.DUMP, 0.75 to Pose.IDLE)
+            val DUMP_TO_SPIT = Animation(0.0 to Pose.DUMP, 0.25 to Pose.SPIT)
+            val SPIT_TO_IDLE = Animation(0.0 to Pose.SPIT, 0.75 to Pose.IDLE)
             val IDLE_TO_PRE_GRAB_FALLEN_BUCKET = Animation(0.0 to Pose.IDLE, 0.5 to Pose.PRE_GRAB_FALLEN_BUCKET)
             val PRE_GRAB_TO_GRAB_FALLEN_BUCKET = Animation(0.0 to Pose.PRE_GRAB_FALLEN_BUCKET, 0.25 to Pose.GRAB_FALLEN_BUCKET)
             val GRAB_FALLEN_BUCKET_TO_DUMP = Animation(0.0 to Pose.GRAB_FALLEN_BUCKET, 0.375 to Pose.FALLEN_BUCKET_MID, 0.75 to Pose.DUMP)
