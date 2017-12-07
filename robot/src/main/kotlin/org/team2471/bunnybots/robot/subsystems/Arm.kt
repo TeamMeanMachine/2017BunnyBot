@@ -152,7 +152,7 @@ object Arm {
 
             val IDLE = Pose(10.0, 0.0)
             val DUMP = Pose(5.0, 50.0)
-            val SPIT = Pose(25.0, 50.0)
+            val SPIT = Pose(25.0, 70.0)
             val GRAB_UPRIGHT_BUCKET = Pose(0.0, 180.0)
             val GRAB_UPRIGHT_MID = Pose(35.0, -75.0)
             val PRE_GRAB_FALLEN_BUCKET = Pose(75.0, -50.0)
