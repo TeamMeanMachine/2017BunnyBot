@@ -90,8 +90,6 @@ object Drive {
         table.setPersistent("Right Power Multiplier")
         CommandSystem.registerDefaultCommand(this, Command("Drive Default",this) {
             periodic {
-        registerDefaultCommand(Command("Drive Default",this) {
-            periodic(15) {
                 drive(Driver.throttle, Driver.softTurn, Driver.hardTurn)
 
                 val leftAmperage = listOf(Talons.DRIVE_LEFT_MOTOR_1, Talons.DRIVE_LEFT_MOTOR_2,

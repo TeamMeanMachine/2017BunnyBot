@@ -24,7 +24,7 @@ object Driver {
         get() = -controller.getRawAxis(2) + controller.getRawAxis(3)
 
     init {
-        Command("", Drive) { Drive.driveDistance(3.0, 3.0) }.runWhen { controller.xButton }
+        Command("Interrupt Drive", Drive) {  }.runWhen { controller.xButton }
     }
 }
 

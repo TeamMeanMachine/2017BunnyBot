@@ -15,38 +15,30 @@ import org.team2471.frc.lib.control.experimental.CommandSystem
 import java.util.concurrent.TimeUnit
 
 class Robot : IterativeRobot() {
-    val ds = DriverStation.getInstance().alliance
+
     override fun robotInit() {
         CommandSystem.initCoroutineContext(newFixedThreadPoolContext(2, "Command Pool"))
-        if (ds == DriverStation.Alliance.Red) {
-            LEDController.write("red")
-        }
-
-        else if (ds == DriverStation.Alliance.Blue){
-            LEDController.write("blue")
-        }
-        LEDController.write("bounce")
-
         Drive
         Arm
         CoDriver
     }
 
     override fun robotPeriodic() {
+        /*
         NetworkTable.getTable("LEDController").putNumber("Amperage", RobotMap.pdp.getCurrent(11))
-        if (ds == DriverStation.Alliance.Red) {
-            LEDController.write("red")
-            LEDController.write("bounce")
+
+        val ds = DriverStation.getInstance()
+        when (ds.alliance){
+            DriverStation.Alliance.Red -> LEDController.write("red")
+            DriverStation.Alliance.Blue -> LEDController.write("blue")
+            else -> LEDController.write("red")
         }
-        else if (ds == DriverStation.Alliance.Blue){
-            LEDController.write("blue")
-            LEDController.write("bounce")
-        }
-        if (DriverStation.getInstance().matchTime <= 30){
+
+        if (ds.matchTime <= 30){
             LEDController.write("fire")
-        }
-
-
+        } else {
+            LEDController.write("bounce")
+        }*/
     }
 
     override fun autonomousInit() {
