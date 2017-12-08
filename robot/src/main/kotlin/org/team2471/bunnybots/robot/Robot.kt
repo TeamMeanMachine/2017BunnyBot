@@ -25,7 +25,7 @@ class Robot : IterativeRobot() {
         else if (ds == DriverStation.Alliance.Blue){
             LEDController.write("blue")
         }
-        LEDController.write("bounce")
+            LEDController.write("bounce")
 
         Drive
         Arm
