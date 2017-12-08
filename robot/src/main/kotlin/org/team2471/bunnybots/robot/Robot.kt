@@ -25,7 +25,7 @@ class Robot : IterativeRobot() {
         else if (ds == DriverStation.Alliance.Blue){
             LEDController.write("blue")
         }
-            LEDController.write("bounce")
+        LEDController.write("bounce")
 
         Drive
         Arm
@@ -36,13 +36,17 @@ class Robot : IterativeRobot() {
         NetworkTable.getTable("LEDController").putNumber("Amperage", RobotMap.pdp.getCurrent(11))
         if (ds == DriverStation.Alliance.Red) {
             LEDController.write("red")
+            LEDController.write("bounce")
         }
-
         else if (ds == DriverStation.Alliance.Blue){
             LEDController.write("blue")
+            LEDController.write("bounce")
+        }
+        if (DriverStation.getInstance().matchTime <= 30){
+            LEDController.write("fire")
         }
 
-        LEDController.write("bounce")
+
     }
 
     override fun autonomousInit() {
