@@ -16,6 +16,7 @@ val intakeBucketCommand = Command("Intake Bucket", Arm) {
             current > AMPERAGE_LIMIT
         }
         println("Has bucket")
+        LEDController.write("grab")
         Arm.intake = 0.0
 
         Arm.playAnimation(Arm.Animation.GRAB_UPRIGHT_BUCKET_TO_DUMP)

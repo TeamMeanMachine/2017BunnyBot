@@ -84,8 +84,14 @@ object Drive {
     val rightDistance: Double get() = rightMotors.position
 
     init {
+        table.setDefaultNumber("Left Power Multiplier", 1.0)
+        table.setDefaultNumber("Right Power Multiplier", 1.0)
+        table.setPersistent("Left Power Multiplier")
+        table.setPersistent("Right Power Multiplier")
         CommandSystem.registerDefaultCommand(this, Command("Drive Default",this) {
             periodic {
+        registerDefaultCommand(Command("Drive Default",this) {
+            periodic(15) {
                 drive(Driver.throttle, Driver.softTurn, Driver.hardTurn)
 
                 val leftAmperage = listOf(Talons.DRIVE_LEFT_MOTOR_1, Talons.DRIVE_LEFT_MOTOR_2,
@@ -107,6 +113,8 @@ object Drive {
     fun drive(throttle: Double, softTurn: Double, hardTurn: Double, shiftSetting: ShiftSetting = ShiftSetting.AUTOMATIC) {
         var leftPower = throttle + (softTurn * Math.abs(throttle)) + hardTurn
         var rightPower = throttle - (softTurn * Math.abs(throttle)) - hardTurn
+        leftPower *= table.getNumber("Left Power Multiplier", 1.0)
+        rightPower *= table.getNumber("Right Power Multiplier", 1.0)
 
         val maxPower = Math.max(Math.abs(leftPower), Math.abs(rightPower))
         if (maxPower > 1) {

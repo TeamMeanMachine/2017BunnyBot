@@ -1,6 +1,7 @@
 package org.team2471.bunnybots.robot
 
 
+import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.IterativeRobot
 import edu.wpi.first.wpilibj.networktables.NetworkTable
 import kotlinx.coroutines.experimental.CommonPool
@@ -14,8 +15,17 @@ import org.team2471.frc.lib.control.experimental.CommandSystem
 import java.util.concurrent.TimeUnit
 
 class Robot : IterativeRobot() {
+    val ds = DriverStation.getInstance().alliance
     override fun robotInit() {
         CommandSystem.initCoroutineContext(newFixedThreadPoolContext(2, "Command Pool"))
+        if (ds == DriverStation.Alliance.Red) {
+            LEDController.write("red")
+        }
+
+        else if (ds == DriverStation.Alliance.Blue){
+            LEDController.write("blue")
+        }
+        LEDController.write("bounce")
 
         Drive
         Arm
@@ -24,11 +34,25 @@ class Robot : IterativeRobot() {
 
     override fun robotPeriodic() {
         NetworkTable.getTable("LEDController").putNumber("Amperage", RobotMap.pdp.getCurrent(11))
+        if (ds == DriverStation.Alliance.Red) {
+            LEDController.write("red")
+            LEDController.write("bounce")
+        }
+        else if (ds == DriverStation.Alliance.Blue){
+            LEDController.write("blue")
+            LEDController.write("bounce")
+        }
+        if (DriverStation.getInstance().matchTime <= 30){
+            LEDController.write("fire")
+        }
+
+
     }
 
     override fun autonomousInit() {
         CommandSystem.isEnabled = true
         SimpleAuto()
+        LEDController.write("random")
     }
 
     override fun autonomousPeriodic() {
@@ -36,6 +60,7 @@ class Robot : IterativeRobot() {
 
     override fun teleopInit() {
         CommandSystem.isEnabled = true
+        LEDController.write("idle1")
     }
 
     override fun teleopPeriodic() {
@@ -43,6 +68,8 @@ class Robot : IterativeRobot() {
 
     override fun testInit() {
         CommandSystem.isEnabled = true
+        LEDController.write("idle2")
+
     }
 
     override fun testPeriodic() {
