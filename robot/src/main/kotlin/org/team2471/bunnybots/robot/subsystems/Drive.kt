@@ -19,13 +19,14 @@ object Drive {
     private const val HIGH_SHIFTPOINT = 5.0
     private const val LOW_SHIFTPOINT = 4.0
     private const val CURRENT_LIMIT = 25
-    private const val RAMP_RATE = 72.0
+    private const val RAMP_RATE = 0.0
 
     private val table = NetworkTable.getTable("Drive")
 
     private val shifter = Solenoid(0)
 
     private val leftMotors = CANTalon(Talons.DRIVE_LEFT_MOTOR_1).apply {
+        enableBrakeMode(true)
         reverseSensor(true)
         configEncoderCodesPerRev(216)
         setPID(1.8, 0.0, 0.1)
@@ -34,34 +35,45 @@ object Drive {
         setCurrentLimit(CURRENT_LIMIT)
         EnableCurrentLimit(true)
     } + CANTalon(Talons.DRIVE_LEFT_MOTOR_2).apply {
+        enableBrakeMode(true)
         setVoltageRampRate(RAMP_RATE)
         setCurrentLimit(CURRENT_LIMIT)
         EnableCurrentLimit(true)
     } + CANTalon(Talons.DRIVE_LEFT_MOTOR_3).apply {
+        enableBrakeMode(true)
         setVoltageRampRate(RAMP_RATE)
         setCurrentLimit(CURRENT_LIMIT)
         EnableCurrentLimit(true)
     } + CANTalon(Talons.DRIVE_LEFT_MOTOR_4).apply {
+        enableBrakeMode(true)
         setVoltageRampRate(RAMP_RATE)
         setCurrentLimit(CURRENT_LIMIT)
         EnableCurrentLimit(true)
     }
 
     private val rightMotors = CANTalon(Talons.DRIVE_RIGHT_MOTOR_3).apply {
+        enableBrakeMode(true)
         reverseOutput(true)
         configEncoderCodesPerRev(216)
         setPID(1.8, 0.0, 0.1)
         changeControlMode(CANTalon.TalonControlMode.PercentVbus)
+        setVoltageRampRate(RAMP_RATE)
         inverted = true
         setCurrentLimit(CURRENT_LIMIT)
         EnableCurrentLimit(true)
     } + CANTalon(Talons.DRIVE_RIGHT_MOTOR_2).apply {
+        enableBrakeMode(true)
+        setVoltageRampRate(RAMP_RATE)
         setCurrentLimit(CURRENT_LIMIT)
         EnableCurrentLimit(true)
     } + CANTalon(Talons.DRIVE_RIGHT_MOTOR_1).apply {
+        enableBrakeMode(true)
+        setVoltageRampRate(RAMP_RATE)
         setCurrentLimit(CURRENT_LIMIT)
         EnableCurrentLimit(true)
     } + CANTalon(Talons.DRIVE_RIGHT_MOTOR_4).apply {
+        enableBrakeMode(true)
+        setVoltageRampRate(RAMP_RATE)
         setCurrentLimit(CURRENT_LIMIT)
         EnableCurrentLimit(true)
     }
