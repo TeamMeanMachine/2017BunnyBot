@@ -173,6 +173,7 @@ object Arm {
             val GRAB_FALLEN_BUCKET_TO_DUMP = Animation(0.0 to Pose.GRAB_FALLEN_BUCKET, 0.375 to Pose.FALLEN_BUCKET_MID, 0.75 to Pose.DUMP)
             val BACK_TO_PRE_GRAB_FALLEN_BUCKET = Animation(0.0 to Pose.GRAB_FALLEN_BUCKET, 0.5 to Pose.PRE_GRAB_FALLEN_BUCKET)
             val QUICK_RESET_GRAB_UPRIGHT_BUCKET = Animation(0.0 to Pose.SPIT, 0.5 to Pose.GRAB_UPRIGHT_BUCKET)
+            val GRAB_UPRIGHT_BUCKET_TO_SPIT = Animation(0.0 to Pose.GRAB_UPRIGHT_BUCKET, .5 to Pose.SPIT)
         }
 
         val shoulderCurve: MotionCurve = MotionCurve().apply {

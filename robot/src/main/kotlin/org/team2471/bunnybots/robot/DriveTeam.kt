@@ -51,7 +51,6 @@ object CoDriver {
 
     init {
         intakeBucketCommand.runWhen { controller.aButton }
-        //preIntakeFallenBucketCommand.runWhen { controller.bButton }
         intakeFallenBucketCommand.runWhen { controller.bButton }
         cancelArmCommand.runWhen { controller.xButton }
         emergencyMode.toggleWhen { controller.backButton }

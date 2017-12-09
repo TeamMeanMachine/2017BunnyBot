@@ -53,6 +53,7 @@ class Robot : IterativeRobot() {
     override fun teleopInit() {
         CommandSystem.isEnabled = true
         LEDController.write("idle1")
+        cancelArmCommand()
     }
 
     override fun teleopPeriodic() {

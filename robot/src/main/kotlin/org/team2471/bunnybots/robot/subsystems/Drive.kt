@@ -121,16 +121,7 @@ object Drive {
         }
 
         // when the solenoid is extended the shifter is in low gear
-        when(shiftSetting) {
-            ShiftSetting.AUTOMATIC -> {
-                val currentSpeed = speed
-                if(currentSpeed > HIGH_SHIFTPOINT) shifter.set(false)
-                else if(currentSpeed < LOW_SHIFTPOINT) shifter.set(true)
-            }
-
-            ShiftSetting.FORCE_HIGH -> shifter.set(false)
-            ShiftSetting.FORCE_LOW -> shifter.set(true)
-        }
+        handleShifting(shiftSetting)
 
         table.putBoolean("High Gear Engaged", !shifter.get())
 
@@ -138,10 +129,23 @@ object Drive {
         rightMotors.set(rightPower)
     }
 
+    private fun handleShifting(shiftSetting: ShiftSetting) {
+        when (shiftSetting) {
+            ShiftSetting.AUTOMATIC -> {
+                val currentSpeed = speed
+                if (currentSpeed > HIGH_SHIFTPOINT) shifter.set(false)
+                else if (currentSpeed < LOW_SHIFTPOINT) shifter.set(true)
+            }
+
+            ShiftSetting.FORCE_HIGH -> shifter.set(false)
+            ShiftSetting.FORCE_LOW -> shifter.set(true)
+        }
+    }
+
     fun driveStraight(throttle: Double, shiftSetting: ShiftSetting = ShiftSetting.AUTOMATIC) =
             drive(throttle, 0.0, 0.0, shiftSetting)
 
-    suspend fun driveDistance (distance:Double,time:Double){
+    suspend fun driveDistance (distance:Double,time:Double, shiftSetting: ShiftSetting = ShiftSetting.FORCE_LOW){
         val curve = MotionCurve()
         curve.storeValue(0.0, 0.0)
         curve.storeValue(time, distance)
@@ -157,6 +161,7 @@ object Drive {
                 val t = timer.get()
                 leftMotors.setpoint = startLeftPosition + curve.getValue(t)
                 rightMotors.setpoint = startRightPosition + curve.getValue(t)
+                handleShifting(shiftSetting)
             }
         } finally {
             leftMotors.changeControlMode(CANTalon.TalonControlMode.PercentVbus)
