@@ -60,7 +60,7 @@ class Robot : IterativeRobot() {
 
     override fun teleopInit() {
         CommandSystem.isEnabled = true
-        sendCommand("idle2")
+        sendCommand("idle1")
 
     }
 
