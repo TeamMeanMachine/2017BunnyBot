@@ -18,28 +18,29 @@ class Robot : IterativeRobot() {
 
     override fun robotInit() {
         CommandSystem.initCoroutineContext(newFixedThreadPoolContext(2, "Command Pool"))
+        val ds = DriverStation.getInstance().alliance
+        if (ds == DriverStation.Alliance.Red) {
+            LEDController.write("red")
+        }
+        else if (ds == DriverStation.Alliance.Blue){
+            LEDController.write("blue")
+        }
+        LEDController.write("fire")
+
         Drive
         Arm
         CoDriver
     }
 
     override fun robotPeriodic() {
-        /*
-        NetworkTable.getTable("LEDController").putNumber("Amperage", RobotMap.pdp.getCurrent(11))
+       // NetworkTable.getTable("LEDController").putNumber("Amperage", RobotMap.pdp.getCurrent(11))
 
-        val ds = DriverStation.getInstance()
-        when (ds.alliance){
-            DriverStation.Alliance.Red -> LEDController.write("red")
-            DriverStation.Alliance.Blue -> LEDController.write("blue")
-            else -> LEDController.write("red")
-        }
-
-        if (ds.matchTime <= 30){
+        if (DriverStation.getInstance().matchTime <= 30) {
             LEDController.write("fire")
-        } else {
-            LEDController.write("bounce")
-        }*/
+
+        }
     }
+
 
     override fun autonomousInit() {
         CommandSystem.isEnabled = true
@@ -69,5 +70,6 @@ class Robot : IterativeRobot() {
 
     override fun disabledInit() {
         CommandSystem.isEnabled = false
+        LEDController.write("idle2")
     }
 }
