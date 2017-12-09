@@ -36,7 +36,7 @@ class Robot : IterativeRobot() {
         else{
             sendCommand("red")
         }
-        sendCommand("idle2")
+        sendCommand("bounce")
 
         Drive
         Arm
@@ -83,6 +83,6 @@ class Robot : IterativeRobot() {
 
     override fun disabledInit() {
         CommandSystem.isEnabled = false
-        sendCommand("idle2")
+        sendCommand("bounce")
     }
 }
