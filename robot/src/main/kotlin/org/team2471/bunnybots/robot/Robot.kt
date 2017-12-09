@@ -16,35 +16,43 @@ import java.util.concurrent.TimeUnit
 
 class Robot : IterativeRobot() {
 
+    companion object {
+     var lastCommand : String = ""
+    }
+    fun sendCommand(command : String){
+        if (lastCommand != command){
+            LEDController.write(command)
+        }
+    }
     override fun robotInit() {
         CommandSystem.initCoroutineContext(newFixedThreadPoolContext(2, "Command Pool"))
+        val ds = DriverStation.getInstance().alliance
+        if (ds == DriverStation.Alliance.Red) {
+            sendCommand("red")
+        }
+        else if (ds == DriverStation.Alliance.Blue){
+            sendCommand("blue")
+        }
+        else{
+            sendCommand("red")
+        }
+        sendCommand("bounce")
+
         Drive
         Arm
         CoDriver
     }
 
     override fun robotPeriodic() {
-        /*
-        NetworkTable.getTable("LEDController").putNumber("Amperage", RobotMap.pdp.getCurrent(11))
 
-        val ds = DriverStation.getInstance()
-        when (ds.alliance){
-            DriverStation.Alliance.Red -> LEDController.write("red")
-            DriverStation.Alliance.Blue -> LEDController.write("blue")
-            else -> LEDController.write("red")
-        }
 
-        if (ds.matchTime <= 30){
-            LEDController.write("fire")
-        } else {
-            LEDController.write("bounce")
-        }*/
     }
+
 
     override fun autonomousInit() {
         CommandSystem.isEnabled = true
         SimpleAuto()
-        LEDController.write("random")
+        sendCommand("random")
     }
 
     override fun autonomousPeriodic() {
@@ -52,16 +60,21 @@ class Robot : IterativeRobot() {
 
     override fun teleopInit() {
         CommandSystem.isEnabled = true
-        LEDController.write("idle1")
-        cancelArmCommand()
+        sendCommand("idle1")
+
     }
 
     override fun teleopPeriodic() {
+        if (DriverStation.getInstance().matchTime <= 30) {
+            sendCommand("fire")
+
+        }
     }
 
     override fun testInit() {
         CommandSystem.isEnabled = true
-        LEDController.write("idle2")
+        sendCommand("red")
+        sendCommand("fire")
 
     }
 
@@ -70,5 +83,6 @@ class Robot : IterativeRobot() {
 
     override fun disabledInit() {
         CommandSystem.isEnabled = false
+        sendCommand("bounce")
     }
 }
