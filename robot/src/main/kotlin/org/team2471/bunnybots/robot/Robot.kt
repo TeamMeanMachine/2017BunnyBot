@@ -16,19 +16,27 @@ import java.util.concurrent.TimeUnit
 
 class Robot : IterativeRobot() {
 
+    companion object {
+     var lastCommand : String = ""
+    }
+    fun sendCommand(command : String){
+        if (lastCommand != command){
+            LEDController.write(command)
+        }
+    }
     override fun robotInit() {
         CommandSystem.initCoroutineContext(newFixedThreadPoolContext(2, "Command Pool"))
         val ds = DriverStation.getInstance().alliance
         if (ds == DriverStation.Alliance.Red) {
-            LEDController.write("red")
+            sendCommand("red")
         }
         else if (ds == DriverStation.Alliance.Blue){
-            LEDController.write("blue")
+            sendCommand("blue")
         }
         else{
-            LEDController.write("red")
+            sendCommand("red")
         }
-        LEDController.write("idle2")
+        sendCommand("idle2")
 
         Drive
         Arm
@@ -44,7 +52,7 @@ class Robot : IterativeRobot() {
     override fun autonomousInit() {
         CommandSystem.isEnabled = true
         SimpleAuto()
-        LEDController.write("random")
+        sendCommand("random")
     }
 
     override fun autonomousPeriodic() {
@@ -52,21 +60,21 @@ class Robot : IterativeRobot() {
 
     override fun teleopInit() {
         CommandSystem.isEnabled = true
-        LEDController.write("idle2")
+        sendCommand("idle2")
 
     }
 
     override fun teleopPeriodic() {
         if (DriverStation.getInstance().matchTime <= 30) {
-            LEDController.write("fire")
+            sendCommand("fire")
 
         }
     }
 
     override fun testInit() {
         CommandSystem.isEnabled = true
-        LEDController.write("red")
-        LEDController.write("fire")
+        sendCommand("red")
+        sendCommand("fire")
 
     }
 
@@ -75,6 +83,6 @@ class Robot : IterativeRobot() {
 
     override fun disabledInit() {
         CommandSystem.isEnabled = false
-        LEDController.write("idle2")
+        sendCommand("idle2")
     }
 }
