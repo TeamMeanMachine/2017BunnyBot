@@ -25,6 +25,9 @@ class Robot : IterativeRobot() {
         else if (ds == DriverStation.Alliance.Blue){
             LEDController.write("blue")
         }
+        else{
+            LEDController.write("red")
+        }
         LEDController.write("idle2")
 
         Drive
