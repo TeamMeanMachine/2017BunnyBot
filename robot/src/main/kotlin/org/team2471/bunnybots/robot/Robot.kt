@@ -22,6 +22,7 @@ class Robot : IterativeRobot() {
     fun sendCommand(command : String){
         if (lastCommand != command){
             LEDController.write(command)
+            lastCommand = command
         }
     }
     override fun robotInit() {
@@ -61,6 +62,7 @@ class Robot : IterativeRobot() {
     override fun teleopInit() {
         CommandSystem.isEnabled = true
         sendCommand("idle1")
+        cancelArmCommand()
 
     }
 

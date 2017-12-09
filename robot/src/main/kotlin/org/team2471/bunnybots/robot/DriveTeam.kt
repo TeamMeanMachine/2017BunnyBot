@@ -1,6 +1,7 @@
 package org.team2471.bunnybots.robot
 
 import edu.wpi.first.wpilibj.XboxController
+import org.team2471.bunnybots.robot.subsystems.Arm
 import org.team2471.bunnybots.robot.subsystems.Arm.emergencyMode
 import org.team2471.bunnybots.robot.subsystems.Drive
 import org.team2471.frc.lib.control.experimental.Command
@@ -54,5 +55,11 @@ object CoDriver {
         intakeFallenBucketCommand.runWhen { controller.bButton }
         cancelArmCommand.runWhen { controller.xButton }
         emergencyMode.toggleWhen { controller.backButton }
+        Command("Increase Wrist Offset"){
+            Arm.adjustWristOffest(5.0)
+        }.runWhen { controller.pov == 0 }
+        Command("Decrease Wrist Offset"){
+            Arm.adjustWristOffest(-5.0)
+        }.runWhen { controller.pov == 180 }
     }
 }

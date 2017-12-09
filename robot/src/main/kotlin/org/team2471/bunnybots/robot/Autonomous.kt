@@ -28,7 +28,7 @@ val SimpleAuto = Command("Simple Auto", Arm, Drive) {
         }
         Arm.intake = 1.0
 
-        Drive.driveDistance(17.5, 3.0, Drive.ShiftSetting.FORCE_HIGH)
+        Drive.driveDistance(17.5, 2.5, Drive.ShiftSetting.FORCE_HIGH)
         Arm.intake = 0.0
         Arm.playAnimation(Arm.Animation.GRAB_UPRIGHT_BUCKET_TO_DUMP)
         Arm.playAnimation(Arm.Animation.DUMP_TO_SPIT)
