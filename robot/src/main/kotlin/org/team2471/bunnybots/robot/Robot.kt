@@ -33,12 +33,8 @@ class Robot : IterativeRobot() {
     }
 
     override fun robotPeriodic() {
-       // NetworkTable.getTable("LEDController").putNumber("Amperage", RobotMap.pdp.getCurrent(11))
 
-        if (DriverStation.getInstance().matchTime <= 30) {
-            LEDController.write("fire")
 
-        }
     }
 
 
@@ -53,15 +49,21 @@ class Robot : IterativeRobot() {
 
     override fun teleopInit() {
         CommandSystem.isEnabled = true
-        LEDController.write("idle1")
+        LEDController.write("idle2")
+
     }
 
     override fun teleopPeriodic() {
+        if (DriverStation.getInstance().matchTime <= 30) {
+            LEDController.write("fire")
+
+        }
     }
 
     override fun testInit() {
         CommandSystem.isEnabled = true
-        LEDController.write("idle2")
+        LEDController.write("red")
+        LEDController.write("fire")
 
     }
 
