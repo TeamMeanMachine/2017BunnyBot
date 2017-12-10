@@ -4,6 +4,8 @@ package org.team2471.bunnybots.robot
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.IterativeRobot
 import edu.wpi.first.wpilibj.networktables.NetworkTable
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.newFixedThreadPoolContext
@@ -15,6 +17,8 @@ import org.team2471.frc.lib.control.experimental.CommandSystem
 import java.util.concurrent.TimeUnit
 
 class Robot : IterativeRobot() {
+    lateinit var autoChooser: SendableChooser<Command>
+
 
     companion object {
      var lastCommand : String = ""
@@ -42,6 +46,11 @@ class Robot : IterativeRobot() {
         Drive
         Arm
         CoDriver
+
+        autoChooser = SendableChooser()
+        autoChooser.addDefault("Bolt", BoltAuto)
+        autoChooser.addObject("Buckets", SimpleAuto)
+        SmartDashboard.putData("Auto Chooser", autoChooser)
     }
 
     override fun robotPeriodic() {
@@ -52,7 +61,8 @@ class Robot : IterativeRobot() {
 
     override fun autonomousInit() {
         CommandSystem.isEnabled = true
-        SimpleAuto()
+        autoChooser.selected.invoke()
+
         sendCommand("random")
     }
 
@@ -69,7 +79,6 @@ class Robot : IterativeRobot() {
     override fun teleopPeriodic() {
         if (DriverStation.getInstance().matchTime <= 30) {
             sendCommand("fire")
-
         }
     }
 

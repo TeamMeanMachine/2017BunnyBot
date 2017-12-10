@@ -56,10 +56,10 @@ object CoDriver {
         cancelArmCommand.runWhen { controller.xButton }
         emergencyMode.toggleWhen { controller.backButton }
         Command("Increase Wrist Offset"){
-            Arm.adjustWristOffest(5.0)
+            Arm.adjustWristOffest(-5.0)
         }.runWhen { controller.pov == 0 }
         Command("Decrease Wrist Offset"){
-            Arm.adjustWristOffest(-5.0)
+            Arm.adjustWristOffest(5.0)
         }.runWhen { controller.pov == 180 }
     }
 }
