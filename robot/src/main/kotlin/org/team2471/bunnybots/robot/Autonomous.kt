@@ -7,7 +7,7 @@ import org.team2471.bunnybots.robot.subsystems.Drive
 import org.team2471.frc.lib.control.experimental.Command
 import org.team2471.frc.lib.control.experimental.suspendUntil
 
-val SimpleAuto = Command("Simple Auto", Arm, Drive) {
+val bucketsAuto = Command("Buckets Auto", Arm, Drive) {
     try {
         Arm.playAnimation(Arm.Animation.IDLE_TO_GRAB_UPRIGHT_BUCKET)
 
@@ -34,7 +34,8 @@ val SimpleAuto = Command("Simple Auto", Arm, Drive) {
         Arm.intake = 0.0
     }
 }
-val BoltAuto = Command("Bolt Auto", Arm, Drive) {
+
+val boltAuto = Command("Bolt Auto", Arm, Drive) {
     val driveDistance = launch(coroutineContext) {
         Drive.driveDistance(51.5, 6.1, Drive.ShiftSetting.FORCE_HIGH)
     }
@@ -46,13 +47,11 @@ val BoltAuto = Command("Bolt Auto", Arm, Drive) {
             Arm.intake = 1.0
             Arm.waitForBucket()
             Arm.intake = 0.0
-        }finally {
+        } finally {
             Arm.intake = 0.0
         }
     }
-    suspendUntil {
-        driveDistance.isCompleted || getBucket.isCompleted
-    }
+    suspendUntil { driveDistance.isCompleted || getBucket.isCompleted }
     driveDistance.cancel()
     getBucket.cancel()
     getBucket.join()

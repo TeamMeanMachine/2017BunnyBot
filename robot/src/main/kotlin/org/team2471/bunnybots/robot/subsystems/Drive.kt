@@ -7,12 +7,11 @@ import edu.wpi.first.wpilibj.networktables.NetworkTable
 import org.team2471.bunnybots.plus
 import org.team2471.bunnybots.robot.Driver
 import org.team2471.bunnybots.robot.RobotMap
+import org.team2471.bunnybots.robot.RobotMap.Talons
 import org.team2471.frc.lib.control.experimental.Command
 import org.team2471.frc.lib.control.experimental.CommandSystem
 import org.team2471.frc.lib.control.experimental.periodic
 import org.team2471.frc.lib.motion_profiling.MotionCurve
-import org.team2471.bunnybots.robot.RobotMap.Talons as Talons
-
 
 object Drive {
     private const val EDGES_PER_100_MS = 216 * 4.0 / 10.0
@@ -80,15 +79,12 @@ object Drive {
 
     val speed: Double get() = Math.abs(-leftMotors.encVelocity / EDGES_PER_100_MS + rightMotors.encVelocity / EDGES_PER_100_MS) / 2.0
 
-    val leftDistance: Double get() = leftMotors.position
-    val rightDistance: Double get() = rightMotors.position
-
     init {
         table.setDefaultNumber("Left Power Multiplier", 1.0)
         table.setDefaultNumber("Right Power Multiplier", 1.0)
         table.setPersistent("Left Power Multiplier")
         table.setPersistent("Right Power Multiplier")
-        CommandSystem.registerDefaultCommand(this, Command("Drive Default",this) {
+        CommandSystem.registerDefaultCommand(this, Command("Drive Default", this) {
             periodic {
                 drive(Driver.throttle, Driver.softTurn, Driver.hardTurn)
 
@@ -120,7 +116,6 @@ object Drive {
             rightPower /= maxPower
         }
 
-        // when the solenoid is extended the shifter is in low gear
         handleShifting(shiftSetting)
 
         table.putBoolean("High Gear Engaged", !shifter.get())
@@ -142,10 +137,7 @@ object Drive {
         }
     }
 
-    fun driveStraight(throttle: Double, shiftSetting: ShiftSetting = ShiftSetting.AUTOMATIC) =
-            drive(throttle, 0.0, 0.0, shiftSetting)
-
-    suspend fun driveDistance (distance:Double,time:Double, shiftSetting: ShiftSetting = ShiftSetting.FORCE_LOW){
+    suspend fun driveDistance(distance: Double, time: Double, shiftSetting: ShiftSetting = ShiftSetting.FORCE_LOW) {
         val curve = MotionCurve()
         curve.storeValue(0.0, 0.0)
         curve.storeValue(time, distance)
@@ -167,37 +159,6 @@ object Drive {
             leftMotors.changeControlMode(CANTalon.TalonControlMode.PercentVbus)
             rightMotors.changeControlMode(CANTalon.TalonControlMode.PercentVbus)
         }
-    }
-
-    val testCommand = Command("Drive Test Command", this) {
-        try {
-            leftMotors.changeControlMode(CANTalon.TalonControlMode.Position)
-            rightMotors.changeControlMode(CANTalon.TalonControlMode.Position)
-            val startLeftDistance = leftMotors.position
-            val startRightDistance = rightMotors.position
-
-            val table = NetworkTable.getTable("Drive PID Test")
-            table.putNumber("Left P", leftMotors.p)
-            table.putNumber("Left D", leftMotors.d)
-            table.putNumber("Right P", rightMotors.p)
-            table.putNumber("Right D", rightMotors.d)
-            periodic(100) {
-                leftMotors.p = table.getNumber("Left P", 0.0)
-                leftMotors.d = table.getNumber("Left D", 0.0)
-
-                rightMotors.p = table.getNumber("Right P", 0.0)
-                rightMotors.d = table.getNumber("Right D", 0.0)
-
-                val setpoint = Driver.throttle * 3
-                leftMotors.setpoint = startLeftDistance + setpoint
-                rightMotors.setpoint = startRightDistance + setpoint
-                println("Setpoint: $setpoint")
-            }
-        } finally {
-            leftMotors.changeControlMode(CANTalon.TalonControlMode.PercentVbus)
-            rightMotors.changeControlMode(CANTalon.TalonControlMode.PercentVbus)
-        }
-
     }
 
     enum class ShiftSetting {

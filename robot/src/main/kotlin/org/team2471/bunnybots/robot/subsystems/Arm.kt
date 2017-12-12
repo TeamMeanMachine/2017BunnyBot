@@ -19,8 +19,7 @@ object Arm {
 
     private const val SHOULDER_SCALE_TO_DEGREES = 90.0 / 250.0
     private const val SHOULDER_OFFSET = 170 // in SRX units
-    private const val WRIST_GEAR_RATIO = 48.0 / 18.0
-    private const val WRIST_OFFSET = 0
+    private const val WRIST_GEAR_RATIO = 8.0 / 3.0
 
     private val shoulderMotors = CANTalon(RobotMap.Talons.ARM_SHOULDER_MOTOR_1).apply {
         changeControlMode(CANTalon.TalonControlMode.Position)
@@ -40,11 +39,7 @@ object Arm {
         enableBrakeMode(true)
         setFeedbackDevice(CANTalon.FeedbackDevice.CtreMagEncoder_Relative)
         setPID(1.5, 0.0, 0.1)
-        println("Position Before: $position EncPosition: $pulseWidthPosition")
         position = 0.0
-
-        println("Position After: $position EncPosition: $pulseWidthPosition")
-        //position = (pulseWidthPosition + WRIST_OFFSET) / 4096.0
         enable()
     }
 
@@ -79,7 +74,6 @@ object Arm {
                 delta += 360
             }
             val newWristAngle = wristAngle + delta
-            //println("Wrist Setpoint: $(newWristAngle)")
             val srxAngle = degreesToWristUnits(newWristAngle)
             wristMotor.setpoint = srxAngle
 
@@ -92,22 +86,18 @@ object Arm {
     val wristError get() = wristAngle - wristUnitsToDegrees(wristMotor.setpoint)
 
     val intakeCurrent get() = RobotMap.pdp.getCurrent(RobotMap.Talons.ARM_INTAKE_MOTOR)
-    val hasBucket: Boolean
-        get() = intakeCurrent > 12.5
-
 
     init {
-        CommandSystem.registerDefaultCommand(this, Command("Arm Default" , this) {
+        CommandSystem.registerDefaultCommand(this, Command("Arm Default", this) {
             var wristAngle = wristAngle
             intake = 0.0
-            while(wristAngle > 180)
+            while (wristAngle > 180)
                 wristAngle -= 360
             while (wristAngle < -180)
-                wristAngle +=360
-            val animation = if (wristAngle < -60 && wristAngle > -180){
+                wristAngle += 360
+            val animation = if (wristAngle < -60 && wristAngle > -180) {
                 Animation(0.0 to currentPose, 0.5 to Pose(45.0, 90.0), 1.0 to Pose.IDLE)
-            }
-            else {
+            } else {
                 Animation(0.0 to currentPose, 0.5 to Pose.IDLE)
             }
             Arm.playAnimation(animation)
@@ -137,18 +127,18 @@ object Arm {
             shoulderAngle = animation.shoulderCurve.getValue(time)
             wristAngle = animation.wristCurve.getValue(time)
         }
+
         suspendUntil {
             val shoulderError = shoulderError
             val wristError = wristError
-            //println("Errors: $shoulderError, $wristError")
             Math.abs(shoulderError) < 3 && Math.abs(wristError) < 3
         }
     }
 
-    suspend fun waitForBucket (){
-        suspendUntil { intakeCurrent>18}
+    suspend fun waitForBucket() {
+        suspendUntil { intakeCurrent > 18 }
         delay(350)
-        if (intakeCurrent<18) waitForBucket()
+        if (intakeCurrent < 18) waitForBucket()
     }
 
     // poses
@@ -165,6 +155,7 @@ object Arm {
             val FALLEN_BUCKET_MID = Pose(50.0, 170.0)
         }
     }
+
     val currentPose get() = Pose(shoulderAngle, wristAngle)
 
     class Animation(vararg keyframes: Pair<Double, Pose>) {
@@ -186,6 +177,7 @@ object Arm {
                 storeValue(time, pose.shoulderAngle)
             }
         }
+
         val wristCurve: MotionCurve = MotionCurve().apply {
             keyframes.forEach { (time, pose) ->
                 var delta = pose.wristAngle - getValue(time)
@@ -198,8 +190,10 @@ object Arm {
                 storeValue(time, getValue(time) + delta)
             }
         }
+
         val length = shoulderCurve.length
     }
+
     val emergencyMode = Command("Arm Emergency Mode", Arm) {
         try {
             shoulderMotors.changeControlMode(CANTalon.TalonControlMode.PercentVbus)
@@ -213,6 +207,5 @@ object Arm {
             shoulderMotors.changeControlMode(CANTalon.TalonControlMode.Position)
             wristMotor.changeControlMode(CANTalon.TalonControlMode.Position)
         }
-
     }
 }

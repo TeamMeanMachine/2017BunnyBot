@@ -5,19 +5,17 @@ import edu.wpi.first.wpilibj.SerialPort
 
 object LEDController {
     private val port: SerialPort? = try {
-        println("Serial port found.")
         SerialPort(9600, SerialPort.Port.kUSB1)
     } catch (_: Exception) {
         DriverStation.reportError("LEDController serial port not found!", false)
         null
     }
 
-    fun write(message: String) {
+    private var lastMessage = ""
+
+    fun send(message: String) {
+        if (lastMessage == message) return
         port?.writeString(message + '\n')
+        lastMessage = message
     }
-
-
 }
-
-
-

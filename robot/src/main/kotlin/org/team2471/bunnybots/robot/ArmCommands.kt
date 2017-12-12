@@ -4,6 +4,7 @@ import kotlinx.coroutines.experimental.delay
 import org.team2471.bunnybots.robot.subsystems.Arm
 import org.team2471.frc.lib.control.experimental.Command
 import org.team2471.frc.lib.control.experimental.suspendUntil
+
 // commands
 const val AMPERAGE_LIMIT = 21.0
 val intakeBucketCommand = Command("Intake Bucket", Arm) {
@@ -12,11 +13,9 @@ val intakeBucketCommand = Command("Intake Bucket", Arm) {
         Arm.intake = 1.0
         suspendUntil {
             val current = Arm.intakeCurrent
-            println("Current: $current")
             current > AMPERAGE_LIMIT
         }
-        println("Has bucket")
-        LEDController.write("grab")
+        LEDController.send("grab")
         Arm.intake = 0.0
 
         Arm.playAnimation(Arm.Animation.GRAB_UPRIGHT_BUCKET_TO_DUMP)
@@ -31,7 +30,7 @@ val intakeBucketCommand = Command("Intake Bucket", Arm) {
     }
 }
 
-val intakeFallenBucketCommand = Command("Intake Fallen Bucket", Arm){
+val intakeFallenBucketCommand = Command("Intake Fallen Bucket", Arm) {
     try {
         Arm.playAnimation(Arm.Animation.IDLE_TO_PRE_GRAB_FALLEN_BUCKET)
         Arm.intake = 0.5
@@ -49,7 +48,6 @@ val intakeFallenBucketCommand = Command("Intake Fallen Bucket", Arm){
             false
         }
         delay(600)
-        println("Has bucket")
         Arm.intake = 0.0
 
         Arm.playAnimation(Arm.Animation.GRAB_FALLEN_BUCKET_TO_DUMP)
@@ -59,7 +57,7 @@ val intakeFallenBucketCommand = Command("Intake Fallen Bucket", Arm){
         delay(600)
 
         Arm.playAnimation(Arm.Animation.SPIT_TO_IDLE)
-    }finally {
+    } finally {
         Arm.intake = 0.0
     }
 }

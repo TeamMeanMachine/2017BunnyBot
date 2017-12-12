@@ -25,7 +25,7 @@ object Driver {
         get() = -controller.getRawAxis(2) + controller.getRawAxis(3)
 
     init {
-        Command("Interrupt Drive", Drive) {  }.runWhen { controller.xButton }
+        Command("Interrupt Drive", Drive) { }.runWhen { controller.xButton }
     }
 }
 
@@ -45,8 +45,6 @@ object CoDriver {
     val intake: Double
         get() = -controller.getRawAxis(2) + controller.getRawAxis(3)
 
-    val isSpitting get() = controller.getRawButton(3)
-
     val dipForFallenBucket get() = controller.yButton
 
 
@@ -55,10 +53,10 @@ object CoDriver {
         intakeFallenBucketCommand.runWhen { controller.bButton }
         cancelArmCommand.runWhen { controller.xButton }
         emergencyMode.toggleWhen { controller.backButton }
-        Command("Increase Wrist Offset"){
+        Command("Increase Wrist Offset") {
             Arm.adjustWristOffest(-5.0)
         }.runWhen { controller.pov == 0 }
-        Command("Decrease Wrist Offset"){
+        Command("Decrease Wrist Offset") {
             Arm.adjustWristOffest(5.0)
         }.runWhen { controller.pov == 180 }
     }
